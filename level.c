@@ -14,6 +14,7 @@ struct LevelElement {
 	int type;
 	//array of pointers, used to hold data used by the update function.
 	//May be NULL, especially when the platform is a standard one.
+	//should be NULL or { x, y, ...}
 	void** properties;
 	//returns 0 if the LevelElement/level was updated successfully,
 	// another number if there was a non-fatal error.
@@ -29,7 +30,7 @@ struct Level {
 
 //Reads the given file and returns an array holding pointers to the
 // LevelElement items that the file specifies
-Level* getLevel(char* fileName);
+void* getLevel(char* fileName);
 
 //Adds the given pointer to the end of the pointer array, resizing as necessary.
 //Takes in the address of the list to be resized, the array's length before the
@@ -46,10 +47,14 @@ int emptyUpdate(LevelElement* this, Level* level);
 int updateMovingPlatform(LevelElement* this, Level* level);
 
 //Updates the entire given level structure.
-void updateAllActive(Level*);
+void updateAllActive(void*);
+
+//Removes all active items from level->array. Used by updateAllActive
+// to avoid conflicts and accidental NULLing of items that should not be NULL.
+void removeActive(Level* level);
 
 //Draws the given Level, given that initscr() has been called.
-void draw(Level*);
+void draw(void*);
 
 int main() {
 	initscr();
@@ -61,10 +66,16 @@ int main() {
 		return 0;
 	}
 	//printf("Read file.\n");
+	LevelElement* vertical;
+	int i = 0;
+	do {
+		vertical = (level->activeElements)[i++];
+	} while (vertical->type != 2);
 	int oldTime = time(NULL);
 	while (1) {
 		if (time(NULL) > oldTime) {
 			draw(level);
+			mvprintw(0,0,"%d", vertical->type);
 			refresh();
 			updateAllActive(level);
 			//updateAllActive(level);
@@ -77,7 +88,10 @@ int main() {
 	return 0;
 }
 
-void updateAllActive(Level* level) {
+void updateAllActive(void* levelPtr) {
+	//clear out the locations with the active items.
+	Level* level = (Level*) levelPtr;
+	removeActive(level);
 	int i;
 	for (i = 0; i < level->numActive; i++) {
 		LevelElement* this = (level->activeElements)[i];
@@ -87,7 +101,18 @@ void updateAllActive(Level* level) {
 	}
 }
 
-void draw(Level* level) {
+void removeActive(Level* level) {
+	int i;
+	for (i = 0; i < level->numActive; i++) {
+		LevelElement* this = (level->activeElements)[i];
+		if (this != NULL) {
+			(level->array)[*((int*)(this->properties)[1])][*((int*)(this->properties)[0])] = NULL;
+		}
+	}
+}
+
+void draw(void* levelPtr) {
+	Level* level = (Level*) levelPtr;
 	int row, column;
 	for (row = 0; row < level->height; row++) {
 		for (column = 0; column < level->width; column++) {
@@ -100,7 +125,7 @@ void draw(Level* level) {
 	}
 }
 
-Level* getLevel(char* fileName) {
+void* getLevel(char* fileName) {
 	//printf("In getLevel.\n");
 	FILE* file = fopen(fileName, "r");
 	if (file == NULL)
@@ -131,9 +156,10 @@ Level* getLevel(char* fileName) {
 			//printf("In inner do-while loop.\n\tc = %d.\n", c);
 			if (c > 31) {
 				LevelElement* current = getLevelElement(c, currentColumn, currentRow);
-				addPtr(&rowArray, currentColumn, current);
-				if (current != NULL && (current->type == 1/* || current->type == 2*/))
-					addPtr(&active, numActive++, current);
+				addPtr(((void***)&rowArray), currentColumn, ((void*)current));
+				if (current != NULL && (current->type == 1
+						|| current->type == 2))
+					addPtr(((void***)&active), numActive++, ((void*)current));
 				currentColumn++;
 				//printf("Added %c to the row.\n", c);
 			}
@@ -146,7 +172,7 @@ Level* getLevel(char* fileName) {
 			free(rowArray);
 			return NULL;
 		}
-		addPtr(&array, currentRow, rowArray);
+		addPtr(((void***)&array), currentRow, ((void*)rowArray));
 		//printf("Added the row to the level.\n");
 		currentRow++;
 	} while (!feof(file));
@@ -156,7 +182,7 @@ Level* getLevel(char* fileName) {
 	level->array = array;
 	level->numActive = numActive;
 	level->activeElements = active;
-	return level;
+	return (void*)level;
 }
 
 void addPtr(void*** list, int oldLength, void* ptr) {
@@ -198,7 +224,8 @@ LevelElement* getLevelElement(char specifier, int x, int y) {
 		//printf("Platform processed.\n");
 		return element;
 	//Add other types
-	} else if (specifier == 'M') {
+	}
+	if (specifier == 'H') {
 		element->representation = '-';
 		element->type = 1;
 		int** prop = malloc(sizeof(int*)*3);
@@ -213,14 +240,34 @@ LevelElement* getLevelElement(char specifier, int x, int y) {
 			prop[1] = ty;
 			//direction
 			prop[2] = dir;
-		element->properties = prop;
+		element->properties = (void**)prop;
 		element->update = updateMovingPlatform;
-	} else {
-		//printf("Returning NULL from getLevelElement(char)\n");
-		free(element);
-		return NULL;
+		return element;
 	}
-	return element;
+	if (specifier == 'V') {
+		mvprintw(50,0,"Processing a vertically moving platform.");
+		element->representation = '-';
+		element->type = 2;
+		mvprintw(50, 41, "Type is %d.", element->type);
+		int** prop = malloc(sizeof(int*)*3);
+			int *tx, *ty, *dir;
+			tx = malloc(sizeof(int));
+			ty = malloc(sizeof(int));
+			dir = malloc(sizeof(int));
+			*tx = x;
+			*ty = y;
+			*dir = 1;
+			prop[0] = tx;
+			prop[1] = ty;
+			//direction
+			prop[2] = dir;
+		element->properties = (void**)prop;
+		element->update = updateMovingPlatform;
+		return element;
+	}
+	//printf("Returning NULL from getLevelElement(char)\n");
+	free(element);
+	return NULL;
 }
 
 int emptyUpdate(LevelElement* this, Level* level) {
@@ -231,24 +278,53 @@ int updateMovingPlatform(LevelElement* this, Level* level) {
 	int* x = (int*)(this->properties)[0];
 	int* y = (int*)(this->properties)[1];
 	int* dir = (int*)(this->properties)[2];
-	
-	if (*dir == 1) {
-		if (*x < level->width-1) {
-			(level->array)[*y][*x+1] = this;
-			(level->array)[*y][*x] = NULL;
-			(*x)++;
-		} else {
-			*dir = -1;
+	if (this->type == 1) {
+		//Horizontal platforms
+		if (*dir == 1) {
+			//Right
+			if (*x < level->width-1) {
+				(level->array)[*y][*x+1] = this;
+				//(level->array)[*y][*x] = NULL;
+				(*x)++;
+			} else {
+				*dir = -1;
+				return 1;
+			}
+		} else if (*dir == -1) {
+			//Left
+			if (*x > 0) {
+				(level->array)[*y][*x-1] = this;
+				//(level->array)[*y][*x] = NULL;
+				(*x)--;
+			} else {
+				*dir = 1;
+				return 1;
+			}
 		}
-	} else if (*dir == -1) {
-		if (*x > 0) {
-			(level->array)[*y][*x-1] = this;
-			(level->array)[*y][*x] = NULL;
-			(*x)--;
-		} else {
-			*dir = 1;
+	} else if (this->type == 2) {
+		mvprintw(0,20,"Moving a vertical platform.");
+		//Vertical platforms.
+		if (*dir == 1) {
+			//Up
+			if (*y > 0) {
+				(level->array)[*y-1][*x] = this;
+				//(level->array)[*y][*x] = NULL;
+				(*y)--;
+			} else {
+				*dir = -1;
+				return 1;
+			}
+		} else if (*dir == -1) {
+			//Down
+			if (*y < level->height-1) {
+				(level->array)[*y+1][*x] = this;
+				//(level->array)[*y][*x] = NULL;
+				(*y)++;
+			} else {
+				*dir = 1;
+				return 1;
+			}
 		}
 	}
-	
 	return 0;
 }
