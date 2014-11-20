@@ -19,6 +19,8 @@ struct LevelElement {
 	//returns 0 if the LevelElement/level was updated successfully,
 	// another number if there was a non-fatal error.
 	int (*update)(LevelElement* this, Level* level);
+	
+	void (*apply)(LevelElement* this, Level* level);
 };
 
 struct Level {
@@ -51,10 +53,13 @@ void updateAllActive(void*);
 
 //Removes all active items from level->array. Used by updateAllActive
 // to avoid conflicts and accidental NULLing of items that should not be NULL.
-void removeActive(Level* level);
+void applyUpdates(Level* level);
 
 //Draws the given Level, given that initscr() has been called.
 void draw(void*);
+
+//Applies the updates to a movingPlatform
+void applyMovingPlatform(LevelElement* this, Level* level);
 
 int main() {
 	initscr();
@@ -74,6 +79,7 @@ int main() {
 	int oldTime = time(NULL);
 	while (1) {
 		if (time(NULL) > oldTime) {
+			mvprintw(40, 0, "%d", time(NULL));
 			draw(level);
 			refresh();
 			updateAllActive(level);
@@ -90,7 +96,6 @@ int main() {
 void updateAllActive(void* levelPtr) {
 	//clear out the locations with the active items.
 	Level* level = (Level*) levelPtr;
-	removeActive(level);
 	int i;
 	for (i = 0; i < level->numActive; i++) {
 		LevelElement* this = (level->activeElements)[i];
@@ -98,14 +103,15 @@ void updateAllActive(void* levelPtr) {
 			this->update(this, level);
 		}
 	}
+	applyUpdates(level);
 }
 
-void removeActive(Level* level) {
+void applyUpdates(Level* level) {
 	int i;
 	for (i = 0; i < level->numActive; i++) {
 		LevelElement* this = (level->activeElements)[i];
 		if (this != NULL) {
-			(level->array)[*((int*)(this->properties)[1])][*((int*)(this->properties)[0])] = NULL;
+			this->apply(this, level);
 		}
 	}
 }
@@ -227,11 +233,16 @@ LevelElement* getLevelElement(char specifier, int x, int y) {
 	if (specifier == 'H') {
 		element->representation = '-';
 		element->type = 1;
-		int** prop = malloc(sizeof(int*)*3);
-			int *tx, *ty, *dir;
+		int** prop = malloc(sizeof(int*)*6);
+			int *tx, *ty, *dir, *newX, *newY, *newDir;
 			tx = malloc(sizeof(int));
 			ty = malloc(sizeof(int));
 			dir = malloc(sizeof(int));
+			
+			newX = malloc(sizeof(int));
+			newY = malloc(sizeof(int));
+			newDir = malloc(sizeof(int));
+			
 			*tx = x;
 			*ty = y;
 			*dir = 1;
@@ -239,20 +250,29 @@ LevelElement* getLevelElement(char specifier, int x, int y) {
 			prop[1] = ty;
 			//direction
 			prop[2] = dir;
+			
+			prop[3] = newX;
+			prop[4] = newY;
+			prop[5] = newDir;
 		element->properties = (void**)prop;
 		element->update = updateMovingPlatform;
+		element->apply = applyMovingPlatform;
 		return element;
 	}
 	if (specifier == 'V') {
-		mvprintw(50,0,"Processing a vertically moving platform.");
 		element->representation = '-';
 		element->type = 2;
 		mvprintw(50, 41, "Type is %d.", element->type);
-		int** prop = malloc(sizeof(int*)*3);
-			int *tx, *ty, *dir;
+		int** prop = malloc(sizeof(int*)*6);
+			int *tx, *ty, *dir, *newX, *newY, *newDir;
 			tx = malloc(sizeof(int));
 			ty = malloc(sizeof(int));
 			dir = malloc(sizeof(int));
+			
+			newX = malloc(sizeof(int));
+			newY = malloc(sizeof(int));
+			newDir = malloc(sizeof(int));
+			
 			*tx = x;
 			*ty = y;
 			*dir = 1;
@@ -260,8 +280,13 @@ LevelElement* getLevelElement(char specifier, int x, int y) {
 			prop[1] = ty;
 			//direction
 			prop[2] = dir;
+			
+			prop[3] = newX;
+			prop[4] = newY;
+			prop[5] = newDir;
 		element->properties = (void**)prop;
 		element->update = updateMovingPlatform;
+		element->apply = applyMovingPlatform;
 		return element;
 	}
 	//printf("Returning NULL from getLevelElement(char)\n");
@@ -274,56 +299,98 @@ int emptyUpdate(LevelElement* this, Level* level) {
 }
 
 int updateMovingPlatform(LevelElement* this, Level* level) {
-	int* x = (int*)(this->properties)[0];
-	int* y = (int*)(this->properties)[1];
-	int* dir = (int*)(this->properties)[2];
+	int x = *(int*)(this->properties)[0];
+	int y = *(int*)(this->properties)[1];
+	int dir = *(int*)(this->properties)[2];
+	int* newX = (int*)(this->properties)[3];
+	int* newY = (int*)(this->properties)[4];
+	int* newDir = (int*)(this->properties)[5];
 	if (this->type == 1) {
 		//Horizontal platforms
-		if (*dir == 1) {
+		if (dir == 1) {
 			//Right
-			if (*x < level->width-1) {
-				(level->array)[*y][*x+1] = this;
-				//(level->array)[*y][*x] = NULL;
-				(*x)++;
+			if (x < level->width-1) {
+				LevelElement* right = (level->array)[y][x+1];
+				if (right == NULL || (right->type == 1 && *((int*)(right->properties)[2]) == dir)) {
+					if ((level->array)[y][x] == this)
+						(level->array)[y][x] = NULL;
+					(level->array)[y][x+1] = this;
+					(*newX)++;
+				} else {
+					//(level->array)[y][x] = this;
+					*newDir = -1;
+					return 1;
+				}
 			} else {
-				*dir = -1;
+				//(level->array)[y][x] = this;
+				*newDir = -1;
 				return 1;
 			}
-		} else if (*dir == -1) {
+		} else if (dir == -1) {
 			//Left
-			if (*x > 0) {
-				(level->array)[*y][*x-1] = this;
-				//(level->array)[*y][*x] = NULL;
-				(*x)--;
+			if (x > 0) {
+				LevelElement* left = (level->array)[y][x-1];
+				if (left == NULL) {
+					if ((level->array)[y][x] == this)
+						(level->array)[y][x] = NULL;
+					(level->array)[y][x-1] = this;
+					(*newX)--;
+				}
 			} else {
-				*dir = 1;
+				//(level->array)[y][x] = this;
+				*newDir = 1;
 				return 1;
 			}
 		}
 	} else if (this->type == 2) {
-		mvprintw(0,20,"Moving a vertical platform.");
 		//Vertical platforms.
-		if (*dir == 1) {
+		if (dir == 1) {
 			//Up
-			if (*y > 1) {
-				(level->array)[*y-1][*x] = this;
-				//(level->array)[*y][*x] = NULL;
-				(*y)--;
+			if (y > 0) {
+				LevelElement* top = (level->array)[y-1][x];
+				if (top == NULL) {
+					if ((level->array)[y][x] == this)
+						(level->array)[y][x] = NULL;
+					(level->array)[y-1][x] = this;
+					(*newY)--;
+				} else {
+					//(level->array)[y][x] = this;
+					*newDir = -1;
+					return 1;
+				}
 			} else {
-				*dir = -1;
+				//(level->array)[y][x] = this;
+				*newDir = -1;
 				return 1;
 			}
-		} else if (*dir == -1) {
+		} else if (dir == -1) {
 			//Down
-			if (*y < level->height-2) {
-				(level->array)[*y+1][*x] = this;
-				//(level->array)[*y][*x] = NULL;
-				(*y)++;
+			if (y < level->height-1) {
+				LevelElement* bottom = (level->array)[y+1][x];
+				if (bottom == NULL) {
+					if ((level->array)[y][x] == this)
+						(level->array)[y][x] = NULL;
+					(level->array)[y+1][x] = this;
+					(*newY)++;
+				} else {
+				//(level->array)[y][x] = this;
+				*newDir = 1;
+				return 1;
+			}
 			} else {
-				*dir = 1;
+				(level->array)[y][x] = this;
+				*newDir = 1;
 				return 1;
 			}
 		}
 	}
 	return 0;
+}
+
+void applyMovingPlatform(LevelElement* this, Level* level) {
+	int** prop = (int**)this->properties;
+	*(prop[0]) = *(prop[3]);
+	*(prop[1]) = *(prop[4]);
+	*(prop[2]) = *(prop[5]);
+	(level->array)[*(prop[1])][*(prop[0])] == this;
 }
