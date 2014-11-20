@@ -2,4 +2,7 @@
 
 //Don't worry about what the void*'s are pointing to, that is handled in level.c
 //Constructs the level from the specified file name.
-void*** getLevel(char* fileName);
+void* getLevel(char* fileName);
+
+//Updates all active elements in the entire given level structure.
+void updateAllActive(void* level);

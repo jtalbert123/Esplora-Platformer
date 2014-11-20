@@ -46,7 +46,7 @@ int emptyUpdate(LevelElement* this, Level* level);
 //Updates the position and direction of a moving platform.
 int updateMovingPlatform(LevelElement* this, Level* level);
 
-//Updates the entire given level structure.
+//Updates all active elements in the entire given level structure.
 void updateAllActive(void*);
 
 //Removes all active items from level->array. Used by updateAllActive
@@ -75,7 +75,6 @@ int main() {
 	while (1) {
 		if (time(NULL) > oldTime) {
 			draw(level);
-			mvprintw(0,0,"%d", vertical->type);
 			refresh();
 			updateAllActive(level);
 			//updateAllActive(level);
@@ -306,7 +305,7 @@ int updateMovingPlatform(LevelElement* this, Level* level) {
 		//Vertical platforms.
 		if (*dir == 1) {
 			//Up
-			if (*y > 0) {
+			if (*y > 1) {
 				(level->array)[*y-1][*x] = this;
 				//(level->array)[*y][*x] = NULL;
 				(*y)--;
@@ -316,7 +315,7 @@ int updateMovingPlatform(LevelElement* this, Level* level) {
 			}
 		} else if (*dir == -1) {
 			//Down
-			if (*y < level->height-1) {
+			if (*y < level->height-2) {
 				(level->array)[*y+1][*x] = this;
 				//(level->array)[*y][*x] = NULL;
 				(*y)++;
