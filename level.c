@@ -48,6 +48,9 @@ int updateMovingPlatform(LevelElement* this, Level* level);
 //Updates the entire given level structure.
 void updateAllActive(Level*);
 
+//Draws the given Level, given that initscr() has been called.
+void draw(Level*);
+
 int main() {
 	initscr();
 	refresh();
@@ -57,24 +60,11 @@ int main() {
 		printf("getLevel returned NULL.\n");
 		return 0;
 	}
-	LevelElement* moving = (level->activeElements)[0];
 	//printf("Read file.\n");
 	int oldTime = time(NULL);
 	while (1) {
 		if (time(NULL) > oldTime) {
-			int row;
-			int column;
-			for (row = 0; row < level->height; row++) {
-				for (column = 0; column < level->width; column++) {
-					LevelElement* this = (level->array)[row][column];
-					if (this != NULL) {
-						mvaddch(row, column, this->representation);
-					} else
-						mvaddch(row, column, ' ');
-				}
-			}
-			mvprintw(0,0,"%d", time(NULL));
-			mvprintw(1,0,"%d", *((int*)(moving->properties)[0]));
+			draw(level);
 			refresh();
 			updateAllActive(level);
 			//updateAllActive(level);
@@ -96,7 +86,20 @@ void updateAllActive(Level* level) {
 		}
 	}
 }
-/**/
+
+void draw(Level* level) {
+	int row, column;
+	for (row = 0; row < level->height; row++) {
+		for (column = 0; column < level->width; column++) {
+			LevelElement* this = (level->array)[row][column];
+			if (this != NULL) {
+				mvaddch(row, column, this->representation);
+			} else
+				mvaddch(row, column, ' ');
+		}
+	}
+}
+
 Level* getLevel(char* fileName) {
 	//printf("In getLevel.\n");
 	FILE* file = fopen(fileName, "r");
