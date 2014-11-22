@@ -1,0 +1,12 @@
+	After some new information, I have decided to define the various structs
+we are using is separate files. This will allow for more modular code and
+hopefully better organization. Also, I am switching from a large array with
+mostly NULL items to an array of the items that do exist.
+As such all items will have an x and y coordinate in addition to the char.
+
+	Also, the coordinates are doubles. This is to enforce separation of
+the game update engine, and the render engine.
+
+NOTE: any changes to a header file must be recompiled before compiling the .c files.
+use "gcc level.h Drawable.h ActiveElement.h Utilities.h" to compile the header files
+use "gcc level.c Drawable.c ActiveElement.c Utilities.c" to compile the .c files
