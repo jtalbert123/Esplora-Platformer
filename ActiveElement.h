@@ -1,21 +1,18 @@
-#include "Level.h"
-
-#ifndef ACTIVE_ELEMENT_HEADER
-#define ACTIVE_ELEMENT_HEADER 1
+#pragma once
 
 typedef struct ActiveElement_Struct ActiveElement;
+
+#include "Level.h"
+#include "LevelElement.h"
+
 struct ActiveElement_Struct {
-	char representation;
-	double x;
-	double y;
-	//does it interact with other objects.
-	int tangible;
-	int is_active;
+	//reference these items by using ((LevelElement*)ActiveElementPointer)->member_variable
+	LevelElement basicData;
 	
 	int type;
 	
-	double* double_properties;
-	int* int_properties;
+	//must have a cast where ever it is used (I recommend using it to point to a struct).
+	void* properties;
 	//returns 0 if the LevelElement/level was updated successfully,
 	// another number if there was a non-fatal error.
 	int (*update)(ActiveElement* this, Level* level);
@@ -25,10 +22,4 @@ struct ActiveElement_Struct {
 
 double SPEED;
 
-void setSpeed(double speed) {
-	SPEED = speed;
-}
-
-Drawable* getLevelElement(char specifier, int x, int y);
-
-#endif
+void setSpeed(double speed);

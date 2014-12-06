@@ -1,87 +1,31 @@
 #include "ActiveElement.h"
-#include "Drawable.h"
 #include "Utilities.h"
 #include <windows.h>
 
-void makePlatform(Drawable*, char rep, double x, double y, int tangible, int active);
+#include <stdio.h>
+
 int updateHorizontalPlatform(ActiveElement* this, Level* level);
 int updateVerticalPlatform(ActiveElement* this, Level* level);
 void applyMovingPlatform(ActiveElement* this);
-
-Drawable* getLevelElement(char specifier, int x, int y) {
-	if (specifier == '-') {
-		//Drawable
-		Drawable* platform = malloc(sizeof(Drawable));
-		makePlatform(platform, '-', x, y, 1, 0);
-		return platform;
-	} else {
-		ActiveElement* platform = malloc(sizeof(ActiveElement));
-		makePlatform((Drawable*)platform, '-', x, y, 1, 1);
-		if (specifier == 'L') {
-			//type 2
-			//moving platform, moving left
-			platform->type = 1;
-			int int_p[2] = { -1, -1 };
-			double double_p[2] = { x, y };
-			platform->double_properties = double_p;
-			platform->int_properties = int_p;
-			platform->update = updateHorizontalPlatform;
-			platform->apply = applyMovingPlatform;
-		} else if (specifier == 'R') {
-			//type 2
-			//moving platform, moving right
-			platform->type = 1;
-			int int_p[2] = { 1, 1 };
-			double double_p[2] = { x, y };
-			platform->double_properties = double_p;
-			platform->int_properties = int_p;
-			platform->update = updateHorizontalPlatform;
-			platform->apply = applyMovingPlatform;
-		} else if (specifier == 'U') {
-			//type 2
-			//moving platform, moving up
-			platform->type = 2;
-			int int_p[2] = { 1, 1 };
-			double double_p[2] = { x, y };
-			platform->double_properties = double_p;
-			platform->int_properties = int_p;
-			platform->update = updateVerticalPlatform;
-			platform->apply = applyMovingPlatform;
-		} else if (specifier == 'D') {
-			//type 2
-			//moving platform, moving down
-			platform->type = 2;
-			int int_p[2] = { -1, -1 };
-			double double_p[2] = { x, y };
-			platform->double_properties = double_p;
-			platform->int_properties = int_p;
-			platform->update = updateVerticalPlatform;
-			platform->apply = applyMovingPlatform;
-		} else {
-			free(platform);
-			return NULL;
-		}
-	}	
-}
-
-void makePlatform(Drawable* platform, char rep, double x, double y, int tangible, int active) {
-			platform->representation = rep;
-			platform->x = x;
-			platform->y = y;
-			platform->tangible = tangible;
-			platform->is_active = active;
-}
-
-int updateHorizontalPlatform(ActiveElement* this, Level* level) {
-	double x = this->x;
-	double y = this->y;
+LevelElement* itemToTheRight(double x, double y, double x_threshold, double y_threshold, Level* level);
+LevelElement* itemToTheLeft(double x, double y, double x_threshold, double y_threshold, Level* level);
+LevelElement* itemAbove(double x, double y, double x_threshold, double y_threshold, Level* level);
+LevelElement* itemBelow(double x, double y, double x_threshold, double y_threshold, Level* level);
+/*
+int updateHorizontalPlatform(HMovingPlatform* this, Level* level) {
+	LevelElement* basic = (LevelElement*)this;
+	double x = basic->x;
+	double y = basic->y;
 	int dir = (this->double_properties)[0];
 	double* new_x = this->double_properties;
 	double* new_y = this->double_properties + 1;
 	int* new_dir = this->int_properties + 1;
 	
 	if (dir == 1) {
-		if (isItemToTheRight(x, y, 1, 1, level) || x >= level->width) {
+		ActiveElement* right = itemToTheRight(x, y, 1, 1, level);
+		int is_right_collidable = 0;
+		is_right_collidable = (right != NULL && right->is_active && (((ActiveElement*)right)->int_properties)[0] != dir);
+		if (x >= level->width || is_right_collidable) {
 			*new_dir = -1;
 			*new_x = x;
 			*new_y = y;
@@ -93,7 +37,10 @@ int updateHorizontalPlatform(ActiveElement* this, Level* level) {
 			return 0;
 		}
 	} else {
-		if (isItemToTheLeft(x, y, 1, 1, level) || x <= 0) {
+		ActiveElement* left = itemToTheLeft(x, y, 1, 1, level);
+		int is_left_collidable = 0;
+		is_left_collidable = (left != NULL && left->is_active && (((ActiveElement*)left)->int_properties)[0] != dir);
+		if (x <= 0 || is_left_collidable) {
 			*new_dir = 1;
 			*new_x = x;
 			*new_y = y;
@@ -116,7 +63,7 @@ int updateVerticalPlatform(ActiveElement* this, Level* level) {
 	int* new_dir = this->int_properties + 1;
 	
 	if (dir == 1) {
-		if (isItemAbove(x, y, 1, 1, level) || y <= 0) {
+		if (itemAbove(x, y, 1, 1, level) || y <= 0) {
 			*new_dir = -1;
 			*new_x = x;
 			*new_y = y;
@@ -128,7 +75,7 @@ int updateVerticalPlatform(ActiveElement* this, Level* level) {
 			return 0;
 		}
 	} else {
-		if (isItemBelow(x, y, 1, 1, level) || y >= level->height) {
+		if (itemBelow(x, y, 1, 1, level) || y >= level->height) {
 			*new_dir = 1;
 			*new_x = x;
 			*new_y = y;
@@ -148,55 +95,59 @@ void applyMovingPlatform(ActiveElement* platform) {
 	
 	(platform->int_properties)[0] = (platform->int_properties)[1];
 }
-
-int isItemToTheRight(double x, double y, double x_threshold, double y_threshold, Level* level) {
+*/
+LevelElement* itemToTheRight(double x, double y, double x_threshold, double y_threshold, Level* level) {
 	int i;
 	for (i = 0; i < level->num_items; i++) {
-		Drawable* item = (level->items)[i];
+		LevelElement* item = (level->items)[i];
 		if (abs(item->y - y) <= y_threshold) {
 			if (item->x > x && abs(item->x - x) <= x_threshold) {
-				return 1;
+				return item;
 			}
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-int isItemToTheLeft(double x, double y, double x_threshold, double y_threshold, Level* level) {
+LevelElement* itemToTheLeft(double x, double y, double x_threshold, double y_threshold, Level* level) {
 	int i;
 	for (i = 0; i < level->num_items; i++) {
-		Drawable* item = (level->items)[i];
+		LevelElement* item = (level->items)[i];
 		if (abs(item->y - y) <= y_threshold) {
 			if (item->x < x && abs(item->x - x) <= x_threshold) {
-				return 1;
+				return item;
 			}
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-int isItemAbove(double x, double y, double x_threshold, double y_threshold, Level* level) {
+LevelElement* itemAbove(double x, double y, double x_threshold, double y_threshold, Level* level) {
 	int i;
 	for (i = 0; i < level->num_items; i++) {
-		Drawable* item = (level->items)[i];
+		LevelElement* item = (level->items)[i];
 		if (abs(item->x - x) <= x_threshold) {
 			if (item->y < y && abs(item->y - y) <= y_threshold) {
-				return 1;
+				return item;
 			}
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-int isItemBelow(double x, double y, double x_threshold, double y_threshold, Level* level) {
+LevelElement* itemBelow(double x, double y, double x_threshold, double y_threshold, Level* level) {
 	int i;
 	for (i = 0; i < level->num_items; i++) {
-		Drawable* item = (level->items)[i];
+		LevelElement* item = (level->items)[i];
 		if (abs(item->x - x) <= x_threshold) {
 			if (item->y > y && abs(item->y - y) <= y_threshold) {
-				return 1;
+				return item;
 			}
 		}
 	}
-	return 0;
+	return NULL;
+}
+
+void setSpeed(double speed) {
+	SPEED = speed;
 }
