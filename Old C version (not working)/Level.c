@@ -79,7 +79,9 @@ void updateLevel(Level* level) {
 	for (i = 0; i < level->num_items; i++) {
 		printf("\t\t\tAt top of loop 1.\n");
 		LevelElement* platform = (level->items)[i];
-		printf("\t\t\tretrieved the item to be updated (maybe): %p.\n", platform);
+		printf("\t\t\tRetrieved the item to be updated (maybe): %p.\n", platform);
+		LevelElement t = (*platform);
+		printf("%d", platform);
 		getchar();
 		printf("\t\t\tPlatform is_active = %d.\n", platform->is_active);
 		if (platform != NULL && platform->is_active == 1) {
