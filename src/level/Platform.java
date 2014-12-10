@@ -21,7 +21,8 @@ public class Platform {
 		// Moving platform
 		types.put(Pattern.compile(MovingPlatform.totalRegex), new MovingPlatform(-1, -1, -1,
 				false, false, 0));
-		System.out.println(MovingPlatform.totalRegex);
+		//potential regex for teleport (to specific location):
+		//"\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
 
 	public static Platform getPlatform(String str, double x, double y) {
