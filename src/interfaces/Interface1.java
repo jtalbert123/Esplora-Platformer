@@ -1,5 +1,7 @@
 package interfaces;
 
+import game.Game;
+
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Graphics;
@@ -8,14 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import game.Game;
 import level.Platform;
 
 public class Interface1 extends JPanel implements ActionListener, KeyListener,
