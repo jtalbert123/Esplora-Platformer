@@ -15,30 +15,26 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import level.Level;
+import game.Game;
 import level.Platform;
 
-public class Interface1 extends JPanel implements ActionListener, KeyListener, Runnable {
+public class Interface1 extends JPanel implements ActionListener, KeyListener,
+		Runnable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7421846972519541464L;
-	
-	private static final int width = 20;
-	private static final int height = 15;
 
 	Canvas canvas;
-	Level level;
+	Game game;
 
 	public Interface1() {
 		super(new BorderLayout());
-		try {
-			level = new Level("level1.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		game = new Game("level1.txt");
 		canvas = new Canvas();
-		canvas.setSize(level.width*width+width, level.height*height+height);
+		Rectangle r = game.getBounds();
+		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH,
+				(r.height + 1) * Platform.PLATFORM_HEIGHT);
 		add(canvas);
 		canvas.addKeyListener(this);
 	}
@@ -68,31 +64,25 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener, R
 
 		}
 	}
-	
+
 	public void run() {
-		long time = System.currentTimeMillis();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Graphics g = canvas.getGraphics();
 		while (true) {
-			level.updateLevel(System.currentTimeMillis() - time);
-			time = System.currentTimeMillis();
-			draw(g);
+			game.update(System.currentTimeMillis());
+			game.draw(g);
 			try {
-				Thread.sleep(75);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	private void draw(Graphics g) {
-		g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		for (Platform p : level.elements) {
-			Rectangle rect = new Rectangle((int)(p.x*width), (int)(p.y*height), width-1, height-1);
-			g.fillRect(rect.x, rect.y, rect.width, rect.height);
-			//System.out.println("Drew: " + rect);
-		}
-	}
-	
+
 	protected static ImageIcon createImageIcon(String path) {
 		java.net.URL imgURL = Interface1.class.getResource(path);
 		if (imgURL != null) {

@@ -4,12 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class Level {
+public class Level implements Iterable<Platform> {
 	public Platform[] elements;
 	public int width;
 	public int height;
@@ -46,7 +47,7 @@ public class Level {
 				int column = 0;
 				while (validate.find()) {
 					String token = validate.group();
-					System.out.println(token);
+					//System.out.println(token);
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)
 						platforms.add(p);
@@ -54,7 +55,7 @@ public class Level {
 				}
 				row++;
 			} else {
-				System.out.println("Invalid line");
+				//System.out.println("Invalid line");
 			}
 		}
 		text.close();
@@ -70,5 +71,9 @@ public class Level {
 	public static void main(String[] args) throws IOException {
 		Level level = new Level("level1.txt");
 		System.out.println(Arrays.toString(level.elements));
+	}
+	
+	public Iterator<Platform> iterator() {
+		return Arrays.asList(elements).iterator();
 	}
 }

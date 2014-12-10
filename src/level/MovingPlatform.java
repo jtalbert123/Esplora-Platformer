@@ -3,6 +3,8 @@ package level;
 import java.util.Scanner;
 
 public class MovingPlatform extends Platform {
+	protected static double THRESHOLD = .1;
+
 	private static String horizontalRegex = "[hH](?:oriz(?:ontal)?)?";
 	private static String verticalRegex = "[vV](?:ert(?:ical)?)?";
 	// above works
@@ -15,7 +17,7 @@ public class MovingPlatform extends Platform {
 	private static String vertCombinedRegex = verticalRegex + " (?:" + upRegex
 			+ "|" + downRegex + ")";
 	public static final String totalRegex = "\\{(?:" + horizCombinedRegex + "|"
-			+ vertCombinedRegex + ") \\d+\\}";
+			+ vertCombinedRegex + ") \\d+(?:\\.\\d+)?\\}";
 	// true for horizontal
 	// false for vertical
 	boolean axis;
@@ -39,7 +41,7 @@ public class MovingPlatform extends Platform {
 		scan.useDelimiter(" ");
 		String axis = scan.next();
 		String direction = scan.next();
-		int speed = scan.nextInt();
+		double speed = scan.nextDouble();
 		if (axis.matches(horizontalRegex)) {
 			if (direction.matches(rightRegex)) {
 				scan.close();
@@ -69,38 +71,74 @@ public class MovingPlatform extends Platform {
 	public String toString() {
 		String dir = (axis) ? ((direction) ? "Right" : "Left")
 				: ((direction) ? "Up" : "Down");
-		return (String.format("Platform at (%d, %d), moving %s.", x, y, dir));
+		return (String.format("Platform at (%f, %f), moving %s", x, y, dir));
 	}
 
 	@Override
 	public void Update(long milliseconds, Level level) {
 		super.Update(milliseconds, level);
 		double time = ((double) milliseconds) / 1000.0;
-		// collision detection in all
+
+		// pseudocode
+		// if this can move in it's direction, without hitting anything, do so.
+		// else, reverse direction
+
 		if (axis) {
+			// horizontal
 			if (direction) {
-				if (x >= level.width)
-					direction = false;
-				else
-					x += speed * time;
+				// right
+				direction = !this.rightBlocked(level);
+				// left
 			} else {
-				if (x <= 0)
-					direction = true;
-				else
-					x -= speed * time;
+				direction = this.leftBlocked(level);
 			}
+			// vertical
 		} else {
 			if (direction) {
 				// up
-				if (y <= 0)
+				if (this.upBlocked(level)) {
 					direction = false;
-				else
-					y -= speed * time;
+					System.out.println("Up blocked.");
+				}
 			} else {
-				if (y >= level.height)
+				// down
+				direction = this.downBlocked(level);
+			}
+		}
+		if (axis) {
+			// horizontal
+			if (direction) {
+				// right
+
+				if (x >= level.width) {
+					direction = false;
+				} else {
+					x += speed * time;
+				}
+				// left
+			} else {
+				if (x <= 0) {
 					direction = true;
-				else
+				} else {
+					x -= speed * time;
+				}
+			}
+			// vertical
+		} else {
+			if (direction) {
+				// up
+				if (y <= 0) {
+					direction = false;
+				} else {
+					y -= speed * time;
+				}
+			} else {
+				// down
+				if (y >= level.height) {
+					direction = true;
+				} else {
 					y += speed * time;
+				}
 			}
 		}
 	}

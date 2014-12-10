@@ -1,11 +1,16 @@
 package level;
 
+import java.awt.Rectangle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class Platform {
+
+	public static final int PLATFORM_WIDTH = 20;
+	public static final int PLATFORM_HEIGHT = 15;
+
 	public double x;
 	public double y;
 	public int type;
@@ -19,23 +24,23 @@ public class Platform {
 		// stable platform
 		types.put(Pattern.compile("-"), new Platform(-1, -1, -1));
 		// Moving platform
-		types.put(Pattern.compile(MovingPlatform.totalRegex), new MovingPlatform(-1, -1, -1,
-				false, false, 0));
-		//potential regex for teleport (to specific location):
-		//"\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
+		types.put(Pattern.compile(MovingPlatform.totalRegex),
+				new MovingPlatform(-1, -1, -1, false, false, 0));
+		// potential regex for teleport (to specific location):
+		// "\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
 
 	public static Platform getPlatform(String str, int x, int y) {
 		Object objToUse = null;
 		for (Pattern p : types.keySet()) {
 			if (p.matcher(str).matches()) {
-				System.out.println(types.get(p).getClass().getName());
+				// System.out.println(types.get(p).getClass().getName());
 				objToUse = types.get(p);
 				break;
 			}
 		}
 		if (objToUse == null) {
-			//System.out.println("The pattern was not recognised.");
+			// System.out.println("The pattern was not recognised.");
 			return null;
 		}
 		try {
@@ -62,6 +67,69 @@ public class Platform {
 		return null;
 	}
 
+	public boolean isCollidingWith(Rectangle r) {
+		return getRect().intersects(r);
+	}
+
+	public boolean isCollidingWith(Platform p) {
+		return getRect().intersects(p.getRect());
+	}
+	
+	protected boolean leftBlocked(Level level) {
+		if (x <= 0)
+			return true;
+		for (Platform p : level) {
+			if (p != this) {
+				if (this.isCollidingWith(p))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	protected boolean rightBlocked(Level level) {
+		if (x >= level.width)
+			return true;
+		for (Platform p : level) {
+			if (p != this) {
+				if (this.isCollidingWith(p))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	protected boolean downBlocked(Level level) {
+		if (y >= level.height)
+			return true;
+		for (Platform p : level) {
+			if (p != this) {
+				if (this.isCollidingWith(p)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	protected boolean upBlocked(Level level) {
+		if (y <= 0)
+			return true;
+		for (Platform p : level) {
+			if (p != this) {
+				if (this.isCollidingWith(p))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public Rectangle getRect() {
+		return new Rectangle((int) (x * PLATFORM_WIDTH) + 1,
+				(int) (y * PLATFORM_HEIGHT) + 1, (int) PLATFORM_WIDTH - 2,
+				(int) PLATFORM_HEIGHT - 2);
+	}
+
 	public Platform makePlatform(String str, Integer x, Integer y) {
 		if (str.equals("-")) {
 			return new Platform(x, y, 0);
@@ -78,7 +146,7 @@ public class Platform {
 	@Override
 	public String toString() {
 		if (type == 0)
-			return String.format("'-' at (%d, %d)", x, y);
+			return String.format("'-' at (%f, %f)", x, y);
 		// should never happen
 		else
 			return "Unknown";
