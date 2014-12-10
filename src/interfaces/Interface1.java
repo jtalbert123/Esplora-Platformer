@@ -38,7 +38,7 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener, R
 			e.printStackTrace();
 		}
 		canvas = new Canvas();
-		canvas.setSize(level.width*width, level.height*height);
+		canvas.setSize(level.width*width+width, level.height*height+height);
 		add(canvas);
 		canvas.addKeyListener(this);
 	}
@@ -71,25 +71,24 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener, R
 	
 	public void run() {
 		long time = System.currentTimeMillis();
+		Graphics g = canvas.getGraphics();
 		while (true) {
 			level.updateLevel(System.currentTimeMillis() - time);
 			time = System.currentTimeMillis();
-			draw();
+			draw(g);
 			try {
-				Thread.sleep(100);
+				Thread.sleep(75);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private void draw() {
-		
-		Graphics g = canvas.getGraphics();
+	private void draw(Graphics g) {
 		g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		for (Platform p : level.elements) {
-			Rectangle rect = new Rectangle(((int)p.x*width), ((int)p.y*height), width, height);
-			g.drawRect(rect.x, rect.y, rect.width, rect.height);
+			Rectangle rect = new Rectangle((int)(p.x*width), (int)(p.y*height), width-1, height-1);
+			g.fillRect(rect.x, rect.y, rect.width, rect.height);
 			//System.out.println("Drew: " + rect);
 		}
 	}
