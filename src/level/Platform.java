@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class Platform {
-	protected double x;
-	protected double y;
-	protected int type;
+	public double x;
+	public double y;
+	public int type;
 	private static HashMap<Pattern, Object> types;
 
 	public static void setUp() {
@@ -25,7 +25,7 @@ public class Platform {
 		//"\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
 
-	public static Platform getPlatform(String str, double x, double y) {
+	public static Platform getPlatform(String str, int x, int y) {
 		Object objToUse = null;
 		for (Pattern p : types.keySet()) {
 			if (p.matcher(str).matches()) {
@@ -84,7 +84,7 @@ public class Platform {
 			return "Unknown";
 	}
 
-	public void Update(int milliseconds, Level level) {
+	public void Update(long milliseconds, Level level) {
 		return;
 	}
 }

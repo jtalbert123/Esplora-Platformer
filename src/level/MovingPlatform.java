@@ -73,7 +73,7 @@ public class MovingPlatform extends Platform {
 	}
 
 	@Override
-	public void Update(int milliseconds, Level level) {
+	public void Update(long milliseconds, Level level) {
 		super.Update(milliseconds, level);
 		double time = ((double) milliseconds) / 1000.0;
 		// collision detection in all

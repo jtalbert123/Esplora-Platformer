@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
 
 
 public class Level {
-	Platform[] elements;
-	int width;
-	int height;
+	public Platform[] elements;
+	public int width;
+	public int height;
 	//private static final Pattern singleCharacter = Pattern.compile(".", Pattern.DOTALL);
 	//private static final Pattern notBrace = Pattern.compile("[^\\{\\}]");
 	private static final String validLine = "(([^\\{\\}])|(\\{[^\\{\\} ]+[^\\{\\}]+\\}))+";
@@ -59,6 +59,12 @@ public class Level {
 		}
 		text.close();
 		elements = platforms.toArray(new Platform[platforms.size()]);
+	}
+	
+	public void updateLevel(long milliseconds) {
+		for (Platform p : elements) {
+			p.Update(milliseconds, this);
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {
