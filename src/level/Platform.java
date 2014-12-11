@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-public class Platform {
+public abstract class Platform {
 
 	public static final int PLATFORM_WIDTH = 20 * 2;
 	public static final int PLATFORM_HEIGHT = 15 * 2;
@@ -15,6 +15,7 @@ public class Platform {
 	public double x;
 	public double y;
 	public int type;
+	public boolean tangible;
 	private static HashMap<Pattern, Object> types;
 
 	public static void setUp() {
@@ -23,25 +24,25 @@ public class Platform {
 		// should handle construction of the platform
 
 		// stable platform
-		types.put(Pattern.compile("-"), new Platform());
+		types.put(Pattern.compile("-"), new BasicPlatform());
 		// Moving platform
-		types.put(Pattern.compile(MovingPlatform.totalRegex),
-				new MovingPlatform());
+		types.put(MovingPlatform.regex, new MovingPlatform());
+		types.put(Spawn.regex, new Spawn());
 		// potential regex for teleport (to specific location):
 		// "\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
 
 	public static Platform getPlatform(String str, int x, int y) {
 		Object objToUse = null;
+		System.out.println(str);
 		for (Pattern p : types.keySet()) {
+			System.out.println("\t" + p);
 			if (p.matcher(str).matches()) {
-				// System.out.println(types.get(p).getClass().getName());
 				objToUse = types.get(p);
 				break;
 			}
 		}
 		if (objToUse == null) {
-			// System.out.println("The pattern was not recognised.");
 			return null;
 		}
 		try {
@@ -73,7 +74,7 @@ public class Platform {
 	}
 
 	public boolean isCollidingWith(Platform p) {
-		return getRect().intersects(p.getRect());
+		return p.tangible && getRect().intersects(p.getRect());
 	}
 
 	protected Platform leftBlocked(Level level) {
@@ -111,7 +112,6 @@ public class Platform {
 		for (Platform p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p)) {
-//					System.out.printf("Collision:\n\t%s\n\t%s\n", this, p);
 					return p;
 				}
 			}
@@ -125,41 +125,21 @@ public class Platform {
 				(int) PLATFORM_HEIGHT);
 	}
 
-	public Platform makePlatform(String str, Integer x, Integer y) {
-		if (str.equals("-")) {
-			return new Platform(x, y, 0);
-		}
-		return null;
-	}
-
-	protected Platform(double x, double y, int type) {
-		this.x = x;
-		this.y = y;
-		this.type = type;
-	}
-
-	protected Platform() {
-		x = -1;
-		y = -1;
-		type = -1;
-	}
+	public abstract Platform makePlatform(String str, Integer x, Integer y);
 
 	@Override
 	public String toString() {
-		if (type == 0)
-			return String.format("'-' at (%f, %f)", x, y);
-		// should never happen
-		else
-			return "Unknown";
+		return String.format("Platform at (%f, %f)", x, y);
 	}
 
-	public void draw(Graphics g) {
-		Rectangle rect = getRect();
-		g.fillRoundRect(rect.x, rect.y, rect.width, rect.height,
-				(int) rect.width / 5, (int) rect.height / 5);
-	}
+	/**
+	 * draws the representation of the object in the top left corner of the
+	 * provided graphics object
+	 * 
+	 * @param g
+	 *            the graphics object to be used
+	 */
+	public abstract void draw(Graphics g);
 
-	public void Update(long milliseconds, Level level) {
-		return;
-	}
+	public abstract void update(long milliseconds, Level level);
 }

@@ -73,10 +73,11 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		}
 		Graphics g = canvas.getGraphics();
 		while (true) {
+			game.clearItems(g);
 			game.update(System.currentTimeMillis());
 			game.draw(g);
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

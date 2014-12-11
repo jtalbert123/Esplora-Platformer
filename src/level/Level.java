@@ -47,15 +47,16 @@ public class Level implements Iterable<Platform> {
 				int column = 0;
 				while (validate.find()) {
 					String token = validate.group();
-					//System.out.println(token);
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)
 						platforms.add(p);
+					else
+						System.out.println(token + " was not found.");
 					column++;
 				}
 				row++;
 			} else {
-				//System.out.println("Invalid line");
+				System.out.println("Invalid line");
 			}
 		}
 		text.close();
@@ -64,13 +65,8 @@ public class Level implements Iterable<Platform> {
 	
 	public void updateLevel(long milliseconds) {
 		for (Platform p : elements) {
-			p.Update(milliseconds, this);
+			p.update(milliseconds, this);
 		}
-	}
-	
-	public static void main(String[] args) throws IOException {
-		Level level = new Level("level1.txt");
-		System.out.println(Arrays.toString(level.elements));
 	}
 	
 	public Iterator<Platform> iterator() {

@@ -20,16 +20,27 @@ public class Game {
 		time = System.currentTimeMillis();
 	}
 	
+	public void clearItems(Graphics g) {
+		for (Platform p : level) {
+			if (p.getClass() != Platform.class) {
+				Rectangle r = p.getRect();
+				g.clearRect(r.x, r.y, r.width, r.height);
+			}
+		}
+	}
+	
 	public void update(long milliseconds) {
 		level.updateLevel(System.currentTimeMillis() - time);
 		time = System.currentTimeMillis();
 	}
 	
 	public void draw(Graphics g) {
-		g.clearRect(0, 0, (level.width+1)*Platform.PLATFORM_WIDTH, (level.height+1)*Platform.PLATFORM_HEIGHT);
 		for (Platform p : level) {
 			g.setColor(Color.black);
-			p.draw(g);
+			Rectangle r = p.getRect();
+			Graphics temp = g.create(r.x, r.y, r.width, r.height);
+			p.draw(temp);
+			temp.dispose();
 		}
 	}
 	
