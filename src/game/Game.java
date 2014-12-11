@@ -7,26 +7,71 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 
+import platforms.MovingPlatform;
 import platforms.Platform;
 import level.Level;
 
+/**
+ * This class represents a single game of the platformer being played. it stores
+ * the level and handles update time tracking.
+ * 
+ * @author James Talbert
+ *
+ */
 public class Game implements KeyListener {
-	private long time;
-	private Level level;
-	
+
+	/**
+	 * The system time when the {@link #update(long)} method was last called.
+	 */
+	protected long time;
+
+	/**
+	 * The current {@link Level} being played.
+	 */
+	protected Level level;
+
+	/**
+	 * Starts a new Game with the given level file.
+	 * 
+	 * @param fileName
+	 *            the name of the file to use as a source for {@link #level}.
+	 */
 	public Game(String fileName) {
 		try {
 			level = new Level(fileName);
 		} catch (IOException e) {
+			level = null;
 			e.printStackTrace();
 		}
 		time = System.currentTimeMillis();
 	}
-	
+
+	/**
+	 * Loads a new {@link Level} into the Game, the old {@link #level} will be
+	 * disposed of by the garbage collector. If the level file cannot be found
+	 * or parsed, the level is unchanged.
+	 * 
+	 * @param fileName
+	 *            the level text file to load into {@link #level}.
+	 */
 	public void loadLevel(String fileName) throws IOException {
-		level = new Level(fileName);
+		Level temp = level;
+		try {
+			level = new Level(fileName);
+		} catch (IOException e) {
+			level = temp;
+			e.printStackTrace();
+		}
 	}
-	
+
+	/**
+	 * Calls clearRect on the given {@link Graphics} object, necessary for items
+	 * that will be moving (such as {@link MovingPlatform}). If used, it must be called before {@link #update()}.
+	 * 
+	 * @param g
+	 *            the graphics object, should be the same graphics object passed
+	 *            into {@link #draw(Graphics)} on it's last call.
+	 */
 	public void clearItems(Graphics g) {
 		for (Platform p : level) {
 			if (p.getClass() != Platform.class) {
@@ -35,12 +80,21 @@ public class Game implements KeyListener {
 			}
 		}
 	}
-	
-	public void update(long currentTime) {
+
+	/**
+	 * Computes the time change and calls {@link Level#updateLevel(long)} on the
+	 * level.
+	 */
+	public void update() {
 		level.updateLevel(System.currentTimeMillis() - time);
 		time = System.currentTimeMillis();
 	}
-	
+
+	/**
+	 * Calls each item to draw it's representation. each {@link Platform} is limited to it's bounding rectangls for drawing.
+	 * @param g
+	 * 	the {@link Graphics} object to draw on.
+	 */
 	public void draw(Graphics g) {
 		for (Platform p : level) {
 			g.setColor(Color.black);
@@ -50,24 +104,28 @@ public class Game implements KeyListener {
 			temp.dispose();
 		}
 	}
-	
+
+	/**
+	 * Returns the logical height and width of the level.
+	 * @return
+	 */
 	public Rectangle getBounds() {
 		return new Rectangle(level.width, level.height);
 	}
 
-	//KeyboardListener
+	// KeyboardListener
 	@Override
 	public void keyTyped(KeyEvent e) {
-		
+
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
+
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
+
 	}
 }

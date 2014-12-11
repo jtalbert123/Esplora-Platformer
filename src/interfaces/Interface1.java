@@ -8,42 +8,67 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import platforms.Platform;
 
-public class Interface1 extends JPanel implements ActionListener, KeyListener,
-		Runnable {
+/**
+ * This class handles visualizing/running the {@link Game}. This should be added
+ * toa frame object and must be run in it's own thread, if not it will prevent
+ * the frame from responding to any commands, such as closing the window.
+ * 
+ * @author James Talbert
+ *
+ */
+public class Interface1 extends JPanel implements ActionListener, Runnable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7421846972519541464L;
 
+	/**
+	 * The {@link Canvas} the {@link #game} will be drawn on.
+	 */
 	Canvas canvas;
+
+	/**
+	 * The {@link Game} object that is used to handle calls to
+	 * {@link Game#clearItems(Graphics) clear()}, {@link Game#update() update()}
+	 * , and {@link Game#draw(Graphics) draw()} methods.
+	 */
 	Game game;
 
+	/**
+	 * Creates a new {@link Game} from a default level file and initializes the
+	 * canvas.
+	 */
 	public Interface1() {
 		super(new BorderLayout());
 		game = new Game("level1.txt");
 		canvas = new Canvas();
 		Rectangle r = game.getBounds();
-		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH,
-				(r.height + 1) * Platform.PLATFORM_HEIGHT);
+		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH, (r.height + 1)
+				* Platform.PLATFORM_HEIGHT);
 		add(canvas);
 		canvas.addKeyListener(game);
 	}
 
+	/**
+	 * Unused, kept for syntax help, in the case that it is needed in the
+	 * future.
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == /* a thing */null) {
 		}
 	}
 
+	/**
+	 * The starting point of the game. Runs the {@link Game#update() update}/
+	 * {@link Game#draw(Graphics) draw} loop.
+	 */
 	public void run() {
 		try {
 			Thread.sleep(100);
@@ -53,7 +78,7 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		Graphics g = canvas.getGraphics();
 		while (true) {
 			game.clearItems(g);
-			game.update(System.currentTimeMillis());
+			game.update();
 			game.draw(g);
 			try {
 				Thread.sleep(100);
@@ -63,16 +88,13 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		}
 	}
 
-	protected static ImageIcon createImageIcon(String path) {
-		java.net.URL imgURL = Interface1.class.getResource(path);
-		if (imgURL != null) {
-			return new ImageIcon(imgURL);
-		} else {
-			System.err.println("Couldn't find file: " + path);
-			return null;
-		}
-	}
-
+	/**
+	 * Creates a new {@link JFrame} and {@link Interface1}, addds the
+	 * {@link Interface1} to the {@link JFrame}, and returns the
+	 * {@link Interface1}.
+	 * 
+	 * @return
+	 */
 	private static Interface1 createAndShowGUI() {
 		Interface1 interface1 = new Interface1();
 		JFrame frame = new JFrame("Interface1");
@@ -83,30 +105,16 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		return interface1;
 	}
 
+	/**
+	 * Shows a new {@link JFrame} object with a {@link Interface1} inside. Then
+	 * runs the {@link Interface1} in a new {@link Thread}.
+	 * @see #createAndShowGUI()
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		Thread t = new Thread(createAndShowGUI());
 		t.start();
-	}
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
-		}
 	}
 }

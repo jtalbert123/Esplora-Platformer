@@ -1,5 +1,7 @@
 package level;
 
+import game.Game;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,9 +14,14 @@ import java.util.regex.Pattern;
 
 import platforms.Platform;
 
+/**
+ * A single level of a platformer {@link Game}.
+ * @author James Talbert
+ *
+ */
 public class Level implements Iterable<Platform> {
 	/**
-	 * The list of {@link level.platforms.Platform}s in the level.
+	 * The list of {@link level.platforms.Platform Platforms} in the level.
 	 */
 	private Platform[] elements;
 
@@ -80,7 +87,6 @@ public class Level implements Iterable<Platform> {
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)
 						platforms.add(p);
-					// System.out.println(token + " was not found.");
 					column++;
 				}
 				row++;
@@ -97,6 +103,8 @@ public class Level implements Iterable<Platform> {
 	 * 
 	 * @param milliseconds
 	 *            the time since the last update.
+	 * @see Platform#update(long, Level)
+	 * @see Game#update(long)
 	 */
 	public void updateLevel(long milliseconds) {
 		for (Platform p : elements) {

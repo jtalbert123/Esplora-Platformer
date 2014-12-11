@@ -123,10 +123,6 @@ public class MovingPlatform extends Platform {
 		if (!intersects) {
 			return false;
 		}
-		if (p.getClass() != MovingPlatform.class) {
-			return true;
-		}
-		// MovingPlatform pm = (MovingPlatform)p;
 		Rectangle thisRect = this.getRect();
 		Rectangle pRect = p.getRect();
 		double xDisplacement = pRect.getCenterX() - thisRect.getCenterX();
