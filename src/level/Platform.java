@@ -1,5 +1,6 @@
 package level;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,8 +9,8 @@ import java.util.regex.Pattern;
 
 public class Platform {
 
-	public static final int PLATFORM_WIDTH = 20;
-	public static final int PLATFORM_HEIGHT = 15;
+	public static final int PLATFORM_WIDTH = 20 * 2;
+	public static final int PLATFORM_HEIGHT = 15 * 2;
 
 	public double x;
 	public double y;
@@ -22,10 +23,10 @@ public class Platform {
 		// should handle construction of the platform
 
 		// stable platform
-		types.put(Pattern.compile("-"), new Platform(-1, -1, -1));
+		types.put(Pattern.compile("-"), new Platform());
 		// Moving platform
 		types.put(Pattern.compile(MovingPlatform.totalRegex),
-				new MovingPlatform(-1, -1, -1, false, false, 0));
+				new MovingPlatform());
 		// potential regex for teleport (to specific location):
 		// "\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
@@ -74,60 +75,54 @@ public class Platform {
 	public boolean isCollidingWith(Platform p) {
 		return getRect().intersects(p.getRect());
 	}
-	
-	protected boolean leftBlocked(Level level) {
-		if (x <= 0)
-			return true;
+
+	protected Platform leftBlocked(Level level) {
 		for (Platform p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p))
-					return true;
+					return p;
 			}
 		}
-		return false;
-	}
-	
-	protected boolean rightBlocked(Level level) {
-		if (x >= level.width)
-			return true;
-		for (Platform p : level) {
-			if (p != this) {
-				if (this.isCollidingWith(p))
-					return true;
-			}
-		}
-		return false;
+		return null;
 	}
 
-	protected boolean downBlocked(Level level) {
-		if (y >= level.height)
-			return true;
+	protected Platform rightBlocked(Level level) {
+		for (Platform p : level) {
+			if (p != this) {
+				if (this.isCollidingWith(p))
+					return p;
+			}
+		}
+		return null;
+	}
+
+	protected Platform downBlocked(Level level) {
 		for (Platform p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p)) {
-					return true;
+					return p;
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
-	protected boolean upBlocked(Level level) {
-		if (y <= 0)
-			return true;
+	protected Platform upBlocked(Level level) {
 		for (Platform p : level) {
 			if (p != this) {
-				if (this.isCollidingWith(p))
-					return true;
+				if (this.isCollidingWith(p)) {
+//					System.out.printf("Collision:\n\t%s\n\t%s\n", this, p);
+					return p;
+				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public Rectangle getRect() {
-		return new Rectangle((int) (x * PLATFORM_WIDTH) + 1,
-				(int) (y * PLATFORM_HEIGHT) + 1, (int) PLATFORM_WIDTH - 2,
-				(int) PLATFORM_HEIGHT - 2);
+		return new Rectangle((int) (x * PLATFORM_WIDTH),
+				(int) (y * PLATFORM_HEIGHT), (int) PLATFORM_WIDTH,
+				(int) PLATFORM_HEIGHT);
 	}
 
 	public Platform makePlatform(String str, Integer x, Integer y) {
@@ -143,6 +138,12 @@ public class Platform {
 		this.type = type;
 	}
 
+	protected Platform() {
+		x = -1;
+		y = -1;
+		type = -1;
+	}
+
 	@Override
 	public String toString() {
 		if (type == 0)
@@ -150,6 +151,12 @@ public class Platform {
 		// should never happen
 		else
 			return "Unknown";
+	}
+
+	public void draw(Graphics g) {
+		Rectangle rect = getRect();
+		g.fillRoundRect(rect.x, rect.y, rect.width, rect.height,
+				(int) rect.width / 5, (int) rect.height / 5);
 	}
 
 	public void Update(long milliseconds, Level level) {

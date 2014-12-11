@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.IOException;
@@ -27,9 +28,8 @@ public class Game {
 	public void draw(Graphics g) {
 		g.clearRect(0, 0, (level.width+1)*Platform.PLATFORM_WIDTH, (level.height+1)*Platform.PLATFORM_HEIGHT);
 		for (Platform p : level) {
-			Rectangle rect = p.getRect();
-			g.fillRect(rect.x, rect.y, rect.width, rect.height);
-			// System.out.println("Drew: " + rect);
+			g.setColor(Color.black);
+			p.draw(g);
 		}
 	}
 	

@@ -1,5 +1,8 @@
 package level;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Scanner;
 
 public class MovingPlatform extends Platform {
@@ -17,22 +20,23 @@ public class MovingPlatform extends Platform {
 	private static String vertCombinedRegex = verticalRegex + " (?:" + upRegex
 			+ "|" + downRegex + ")";
 	public static final String totalRegex = "\\{(?:" + horizCombinedRegex + "|"
-			+ vertCombinedRegex + ") \\d+(?:\\.\\d+)?\\}";
-	// true for horizontal
-	// false for vertical
-	boolean axis;
-	// true for right/up
-	// false for left/down
-	boolean direction;
+			+ vertCombinedRegex + ") (?:(?:\\d+(?:\\.\\d+)?)|(?:\\.\\d+)?)\\}";
+
+	Direction direction;
 	// units per second
 	double speed;
 
-	public MovingPlatform(double x, double y, int type, boolean direction,
-			boolean axis, double speed) {
+	public MovingPlatform(double x, double y, int type, Direction direction,
+			double speed) {
 		super(x, y, type);
 		this.direction = direction;
-		this.axis = axis;
 		this.speed = speed;
+	}
+
+	public MovingPlatform() {
+		super();
+		direction = Direction.UP;
+		speed = 0;
 	}
 
 	@Override
@@ -45,21 +49,21 @@ public class MovingPlatform extends Platform {
 		if (axis.matches(horizontalRegex)) {
 			if (direction.matches(rightRegex)) {
 				scan.close();
-				return new MovingPlatform(x, y, 1, true, true, speed);
+				return new MovingPlatform(x, y, 1, Direction.RIGHT, speed);
 			}
 			if (direction.matches(leftRegex)) {
 				scan.close();
-				return new MovingPlatform(x, y, 1, false, true, speed);
+				return new MovingPlatform(x, y, 1, Direction.LEFT, speed);
 			}
 		}
 		if (axis.matches(verticalRegex)) {
 			if (direction.matches(upRegex)) {
 				scan.close();
-				return new MovingPlatform(x, y, 1, true, false, speed);
+				return new MovingPlatform(x, y, 1, Direction.UP, speed);
 			}
 			if (direction.matches(downRegex)) {
 				scan.close();
-				return new MovingPlatform(x, y, 1, false, false, speed);
+				return new MovingPlatform(x, y, 1, Direction.DOWN, speed);
 			}
 		}
 
@@ -67,11 +71,66 @@ public class MovingPlatform extends Platform {
 		return null;
 	}
 
+	/**
+	 * Returns true if p will collide with this.
+	 */
+	@Override
+	public boolean isCollidingWith(Platform p) {
+		boolean intersects = getRect().intersects(p.getRect());
+		if (!intersects) {
+			return false;
+		}
+		if (p.getClass() != MovingPlatform.class) {
+			return true;
+		}
+		// MovingPlatform pm = (MovingPlatform)p;
+		Rectangle thisRect = this.getRect();
+		Rectangle pRect = p.getRect();
+		double xDisplacement = pRect.getCenterX() - thisRect.getCenterX();
+		double yDisplacement = pRect.getCenterY() - thisRect.getCenterY();
+		// System.out.println(thisRect.getCenterY() - pRect.getCenterY());
+		// System.out.println(thisRect + "\n" + pRect);
+		double angle = Math.atan2(-yDisplacement, xDisplacement);
+
+		double angleURCorner = Math.atan2(PLATFORM_HEIGHT, PLATFORM_WIDTH);
+		double angleLRCorner = Math.atan2(-PLATFORM_HEIGHT, PLATFORM_WIDTH);
+		double angleLLCorner = Math.atan2(-PLATFORM_HEIGHT, -PLATFORM_WIDTH);
+		double angleULCorner = Math.atan2(PLATFORM_HEIGHT, -PLATFORM_WIDTH);
+
+		/*
+		 * System.out.printf("angleURCorner: %f\n" + "angleULCorner: %f\n" +
+		 * "angleLRCorner: %f\n" + "angleLLCorner: %f\n", angleURCorner/Math.PI,
+		 * angleULCorner/Math.PI, angleLRCorner/Math.PI, angleLLCorner/Math.PI);
+		 */
+		System.out.println("Angle: " + angle / Math.PI);
+		if (this.direction == Direction.UP) {
+			if (angle <= angleULCorner && angle >= angleURCorner) {
+				System.out.println("collision");
+				return true;
+			}
+		} else if (this.direction == Direction.RIGHT) {
+			if (angle <= angleURCorner && angle >= angleLRCorner) {
+				System.out.println("collision");
+				return true;
+			}
+		} else if (this.direction == Direction.DOWN) {
+			if (angle <= angleLRCorner && angle >= angleLLCorner) {
+				System.out.println("collision");
+				return true;
+			}
+		} else if (this.direction == Direction.LEFT) {
+			if (angle <= angleLLCorner && angle >= angleULCorner) {
+				System.out.println("collision");
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
-		String dir = (axis) ? ((direction) ? "Right" : "Left")
-				: ((direction) ? "Up" : "Down");
-		return (String.format("Platform at (%f, %f), moving %s", x, y, dir));
+		return (String.format("Platform at (%f, %f), moving %s", x, y,
+				direction));
 	}
 
 	@Override
@@ -82,64 +141,74 @@ public class MovingPlatform extends Platform {
 		// pseudocode
 		// if this can move in it's direction, without hitting anything, do so.
 		// else, reverse direction
-
-		if (axis) {
-			// horizontal
-			if (direction) {
-				// right
-				direction = !this.rightBlocked(level);
-				// left
+		Platform blocking = null;
+		if (direction == Direction.UP) {
+			blocking = upBlocked(level);
+			if (y <= 0 || blocking != null) {
+				direction = Direction.DOWN;
+				y += time * speed;
+				if (blocking != null && blocking.getClass() == MovingPlatform.class
+						&& ((MovingPlatform) blocking).direction == Direction.DOWN) {
+					((MovingPlatform) blocking).direction = Direction.UP;
+					blocking.y -= time * ((MovingPlatform) blocking).speed;
+				}
 			} else {
-				direction = this.leftBlocked(level);
+				y -= time * speed;
 			}
-			// vertical
-		} else {
-			if (direction) {
-				// up
-				if (this.upBlocked(level)) {
-					direction = false;
-					System.out.println("Up blocked.");
+		} else if (direction == Direction.DOWN) {
+			blocking = downBlocked(level);
+			if (y >= level.height || blocking != null) {
+				direction = Direction.UP;
+				y -= time * speed;
+				if (blocking != null && blocking.getClass() == MovingPlatform.class
+						&& ((MovingPlatform) blocking).direction == Direction.UP) {
+					((MovingPlatform) blocking).direction = Direction.DOWN;
+					blocking.y += time * ((MovingPlatform) blocking).speed;
 				}
 			} else {
-				// down
-				direction = this.downBlocked(level);
+				y += time * speed;
 			}
-		}
-		if (axis) {
-			// horizontal
-			if (direction) {
-				// right
-
-				if (x >= level.width) {
-					direction = false;
-				} else {
-					x += speed * time;
+		} else if (direction == Direction.RIGHT) {
+			blocking = rightBlocked(level);
+			if (x >= level.width || blocking != null) {
+				direction = Direction.LEFT;
+				x += time * speed;
+				if (blocking != null && blocking.getClass() == MovingPlatform.class
+						&& ((MovingPlatform) blocking).direction == Direction.LEFT) {
+					((MovingPlatform) blocking).direction = Direction.RIGHT;
+					blocking.x += time * ((MovingPlatform) blocking).speed;
 				}
-				// left
 			} else {
-				if (x <= 0) {
-					direction = true;
-				} else {
-					x -= speed * time;
-				}
+				x += time * speed;
 			}
-			// vertical
-		} else {
-			if (direction) {
-				// up
-				if (y <= 0) {
-					direction = false;
-				} else {
-					y -= speed * time;
+		} else if (direction == Direction.LEFT) {
+			blocking = leftBlocked(level);
+			if (x <= 0 || blocking != null) {
+				direction = Direction.RIGHT;
+				x += time * speed;
+				if (blocking != null && blocking.getClass() == MovingPlatform.class
+						&& ((MovingPlatform) blocking).direction == Direction.RIGHT) {
+					((MovingPlatform) blocking).direction = Direction.LEFT;
+					blocking.x -= time * ((MovingPlatform) blocking).speed;
 				}
 			} else {
-				// down
-				if (y >= level.height) {
-					direction = true;
-				} else {
-					y += speed * time;
-				}
+				x -= time * speed;
 			}
 		}
+	}
+
+	@Override
+	public void draw(Graphics g) {
+		super.draw(g);
+		g.setColor(Color.darkGray);
+		Rectangle rect = getRect();
+		g.fillRoundRect(rect.x + rect.width / 4, rect.y + rect.height / 4,
+				rect.width / 2, rect.height / 2, (int) rect.width / 10,
+				(int) rect.height / 10);
+	}
+
+	private static enum Direction {
+		UP, RIGHT, DOWN, LEFT
+
 	}
 }
