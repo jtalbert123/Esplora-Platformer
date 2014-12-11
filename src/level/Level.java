@@ -12,7 +12,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import platforms.Platform;
+import level.platforms.Platform;
 
 /**
  * A single level of a platformer {@link Game}.
@@ -104,7 +104,7 @@ public class Level implements Iterable<Platform> {
 	 * @param milliseconds
 	 *            the time since the last update.
 	 * @see Platform#update(long, Level)
-	 * @see Game#update(long)
+	 * @see Game#update()
 	 */
 	public void updateLevel(long milliseconds) {
 		for (Platform p : elements) {

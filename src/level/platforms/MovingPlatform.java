@@ -1,4 +1,4 @@
-package platforms;
+package level.platforms;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -40,8 +40,6 @@ public class MovingPlatform extends Platform {
 
 	/**
 	 * The direction the platform is traveling.
-	 * 
-	 * @see Direction
 	 */
 	protected Direction direction;
 

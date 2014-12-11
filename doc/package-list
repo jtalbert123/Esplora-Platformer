@@ -2,5 +2,5 @@
 game
 interfaces
 level
-platforms
+level.platforms
 player

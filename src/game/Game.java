@@ -7,9 +7,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 
-import platforms.MovingPlatform;
-import platforms.Platform;
 import level.Level;
+import level.platforms.MovingPlatform;
+import level.platforms.Platform;
 
 /**
  * This class represents a single game of the platformer being played. it stores
@@ -21,7 +21,7 @@ import level.Level;
 public class Game implements KeyListener {
 
 	/**
-	 * The system time when the {@link #update(long)} method was last called.
+	 * The system time when the {@link #update()} method was last called.
 	 */
 	protected long time;
 
@@ -107,7 +107,7 @@ public class Game implements KeyListener {
 
 	/**
 	 * Returns the logical height and width of the level.
-	 * @return
+	 * @return a new rectangle width the width/height of the level.
 	 */
 	public Rectangle getBounds() {
 		return new Rectangle(level.width, level.height);

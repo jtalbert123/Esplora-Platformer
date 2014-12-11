@@ -1,4 +1,4 @@
-package platforms;
+package level.platforms;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;

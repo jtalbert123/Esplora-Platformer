@@ -1,4 +1,4 @@
-package platforms;
+package level.platforms;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -95,7 +95,7 @@ public abstract class Platform {
 	 *            by {@link #makePlatform(String, Integer, Integer)
 	 *            makePlatform(...)} to position the new Platform object.
 	 * @param y
-	 * @return
+	 * @return the platform specified by the token
 	 */
 	public static Platform getPlatform(String token, int x, int y) {
 		Object objToUse = null;
@@ -166,7 +166,7 @@ public abstract class Platform {
 	/**
 	 * Gets the bounding {@link Rectangle} of the Platform.
 	 * 
-	 * @return
+	 * @return the bounding rectangle of the platform in pixels <b>not logical grid spaces</b>.
 	 */
 	public Rectangle getRect() {
 		return new Rectangle((int) (x * PLATFORM_WIDTH),
@@ -206,7 +206,7 @@ public abstract class Platform {
 	 * Updates the Platform object. Implementations will vary greatly among
 	 * subclasses.
 	 * 
-	 * @param milliseconds
+	 * @param currentTime
 	 *            the current system time, not the interval.
 	 * @param level
 	 *            the level the platform is in, necessary for collision

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="javadoc">
     <target name="javadoc">
-        <javadoc access="package" author="true" classpath="." destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="game,interfaces,platforms,level,player" source="1.7" sourcefiles="src/RegexTester.java" sourcepath="src" splitindex="true" use="true" version="true"/>
+        <javadoc access="package" author="true" classpath="." destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="game,interfaces,level,level.platforms,player" source="1.7" sourcefiles="src/RegexTester.java" sourcepath="src" splitindex="true" use="true" version="true"/>
     </target>
 </project>

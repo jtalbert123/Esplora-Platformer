@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import platforms.Platform;
+import level.platforms.Platform;
 
 /**
  * This class handles visualizing/running the {@link Game}. This should be added
@@ -93,7 +93,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 * {@link Interface1} to the {@link JFrame}, and returns the
 	 * {@link Interface1}.
 	 * 
-	 * @return
+	 * @return the {@link Interface1} that is in the new window.
 	 */
 	private static Interface1 createAndShowGUI() {
 		Interface1 interface1 = new Interface1();
