@@ -93,6 +93,7 @@ public class Game implements Action {
 	 * level.
 	 */
 	public void update() {
+		//System.out.println("Update: " + System.currentTimeMillis());
 		if (!paused) {
 			level.updateLevel(System.currentTimeMillis() - time);
 			time = System.currentTimeMillis();
@@ -123,38 +124,38 @@ public class Game implements Action {
 	}
 
 	// KeyboardListener
+	
+	protected boolean isEnabled;
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("Event" + e);
+		System.out.println("Event");
 	}
 	
 	@Override
 	public void setEnabled(boolean b) {
-		// TODO Auto-generated method stub
-		
+		isEnabled = b;
 	}
 	
 	@Override
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
 	public void putValue(String key, Object value) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("putValue");
 	}
 	
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return isEnabled;
 	}
 	
 	@Override
 	public Object getValue(String key) {
 		// TODO Auto-generated method stub
+		System.out.println("getValue");
 		return null;
 	}
 	
