@@ -80,9 +80,8 @@ public class Level implements Iterable<Platform> {
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)
 						platforms.add(p);
-					else
-						// System.out.println(token + " was not found.");
-						column++;
+					// System.out.println(token + " was not found.");
+					column++;
 				}
 				row++;
 			} else {
@@ -113,8 +112,8 @@ public class Level implements Iterable<Platform> {
 	/**
 	 * Gets an array (typed by the given class, no casting necessary) of all
 	 * {@link level.platforms.Platform platforms} in the level with the given
-	 * type (type.isInstance({@link level.platforms.Platform platform}) returns true). Subclasses
-	 * of the given type are included.
+	 * type (type.isInstance({@link level.platforms.Platform platform}) returns
+	 * true). Subclasses of the given type are included.
 	 * 
 	 * @param type
 	 *            the type of {@link level.platforms.Platform platforms} to
