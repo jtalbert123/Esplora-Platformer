@@ -1,7 +1,9 @@
-package level;
+package platforms;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+
+import level.Level;
 
 public class BasicPlatform extends Platform {
 
@@ -29,8 +31,7 @@ public class BasicPlatform extends Platform {
 	}
 
 	/**
-	 * draws the representation of the object in the top left corner of the
-	 * provided graphics object
+	 * Draws a black box with rounded corners.
 	 * 
 	 * @param g
 	 *            the graphics object to be used

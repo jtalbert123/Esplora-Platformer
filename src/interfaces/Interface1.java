@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import level.Platform;
+import platforms.Platform;
 
 public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		Runnable {
@@ -36,32 +36,11 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH,
 				(r.height + 1) * Platform.PLATFORM_HEIGHT);
 		add(canvas);
-		canvas.addKeyListener(this);
+		canvas.addKeyListener(game);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == /* a thing */null) {
-		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getSource() == canvas) {
-
 		}
 	}
 
@@ -108,5 +87,26 @@ public class Interface1 extends JPanel implements ActionListener, KeyListener,
 		UIManager.put("swing.boldMetal", Boolean.FALSE);
 		Thread t = new Thread(createAndShowGUI());
 		t.start();
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		if (e.getSource() == canvas) {
+
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (e.getSource() == canvas) {
+
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getSource() == canvas) {
+
+		}
 	}
 }

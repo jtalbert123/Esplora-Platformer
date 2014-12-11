@@ -1,13 +1,15 @@
-package level;
+package platforms;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.regex.Pattern;
 
+import level.Level;
+
 public class Spawn extends Platform {
 	
-	public static final Pattern regex = Pattern.compile("S");
+	public static final Pattern regex = Pattern.compile("[Ss]");
 	
 	public Spawn(double x, double y) {
 		this.x = x;
@@ -25,7 +27,7 @@ public class Spawn extends Platform {
 	
 	@Override
 	public Platform makePlatform(String str, Integer x, Integer y) {
-		System.out.println("Creating spawn object.");
+		//System.out.println("Creating spawn object.");
 		return new Spawn(x, y);
 	}
 	

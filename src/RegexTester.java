@@ -1,7 +1,7 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import level.MovingPlatform;
+import platforms.MovingPlatform;
 
 
 public class RegexTester {
