@@ -72,4 +72,15 @@ public class Level implements Iterable<Platform> {
 	public Iterator<Platform> iterator() {
 		return Arrays.asList(elements).iterator();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <PlatformType> PlatformType[] getAll(Class<PlatformType> type) {
+		ArrayList<PlatformType> subset = new ArrayList<>();
+		for (Platform p : elements) {
+			if (p.getClass() == type) {
+				subset.add((PlatformType)p);
+			}
+		}
+		return subset.toArray(((PlatformType[])new Object[subset.size()]));
+	}
 }
