@@ -89,9 +89,9 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 		add(canvas);
 		
 		InputMap keyStrokes = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, 0), "semicolon");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "pause");
 		ActionMap keyActions = this.getActionMap();
-		keyActions.put("semicolon", game);
+		keyActions.put("pause", game);
 	}
 
 	/**

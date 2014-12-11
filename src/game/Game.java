@@ -35,7 +35,7 @@ public class Game extends AbstractAction implements Action {
 	 * The current {@link Level} being played.
 	 */
 	protected Level level;
-	
+
 	private boolean paused = false;
 
 	/**
@@ -74,7 +74,8 @@ public class Game extends AbstractAction implements Action {
 
 	/**
 	 * Calls clearRect on the given {@link Graphics} object, necessary for items
-	 * that will be moving (such as {@link MovingPlatform}). If used, it must be called before {@link #update()}.
+	 * that will be moving (such as {@link MovingPlatform}). If used, it must be
+	 * called before {@link #update()}.
 	 * 
 	 * @param g
 	 *            the graphics object, should be the same graphics object passed
@@ -94,7 +95,7 @@ public class Game extends AbstractAction implements Action {
 	 * level.
 	 */
 	public void update() {
-		//System.out.println("Update: " + System.currentTimeMillis());
+		// System.out.println("Update: " + System.currentTimeMillis());
 		if (!paused) {
 			level.updateLevel(System.currentTimeMillis() - time);
 			time = System.currentTimeMillis();
@@ -102,9 +103,11 @@ public class Game extends AbstractAction implements Action {
 	}
 
 	/**
-	 * Calls each item to draw it's representation. each {@link Platform} is limited to it's bounding rectangls for drawing.
+	 * Calls each item to draw it's representation. each {@link Platform} is
+	 * limited to it's bounding rectangls for drawing.
+	 * 
 	 * @param g
-	 * 	the {@link Graphics} object to draw on.
+	 *            the {@link Graphics} object to draw on.
 	 */
 	public void draw(Graphics g) {
 		for (Platform p : level) {
@@ -118,6 +121,7 @@ public class Game extends AbstractAction implements Action {
 
 	/**
 	 * Returns the logical height and width of the level.
+	 * 
 	 * @return a new rectangle width the width/height of the level.
 	 */
 	public Rectangle getBounds() {
@@ -127,7 +131,14 @@ public class Game extends AbstractAction implements Action {
 	// KeyboardListener
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		if (e.getActionCommand().equals("p")) {
+			if (paused) {
+				time = System.currentTimeMillis();
+				paused = false;
+			} else {
+				paused = true;
+			}
+		}
 		System.out.println(e.getActionCommand());
 	}
 }
