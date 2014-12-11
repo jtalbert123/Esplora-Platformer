@@ -8,10 +8,21 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 
 import level.platforms.Platform;
 
@@ -40,6 +51,16 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 * , and {@link Game#draw(Graphics) draw()} methods.
 	 */
 	Game game;
+	
+	/**
+	 * The button to allow the user to select a new level.
+	 */
+	JButton newLevel;
+	
+	/**
+	 * The fileChooser to select a new level file.
+	 */
+	JFileChooser fc;
 
 	/**
 	 * Creates a new {@link Game} from a default level file and initializes the
@@ -47,13 +68,30 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 */
 	public Interface1() {
 		super(new BorderLayout());
+		fc = new JFileChooser();
+		fc.setFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return "Level files (.txt)";
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				return f.getName().endsWith(".txt") || f.isDirectory();
+			}
+		});
 		game = new Game("level1.txt");
 		canvas = new Canvas();
 		Rectangle r = game.getBounds();
 		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH, (r.height + 1)
 				* Platform.PLATFORM_HEIGHT);
 		add(canvas);
-		canvas.addKeyListener(game);
+		
+		InputMap keyStrokes = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		keyStrokes.put(KeyStroke.getKeyStroke("SPACE"), "spacebar");
+		ActionMap keyActions = this.getActionMap();
+		keyActions.put("spacebar", game);
 	}
 
 	/**
@@ -61,7 +99,15 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 * future.
 	 */
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == /* a thing */null) {
+		if (e.getSource() == newLevel) {
+			int opt = fc.showOpenDialog(null);
+			if (opt == JFileChooser.APPROVE_OPTION) {
+				try {
+					game.loadLevel(fc.getSelectedFile().getCanonicalPath());
+				} catch (IOException e1) {
+					
+				}
+			}
 		}
 	}
 

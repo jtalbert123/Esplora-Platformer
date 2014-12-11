@@ -3,9 +3,14 @@ package game;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.peer.KeyboardFocusManagerPeer;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+
+import javax.swing.Action;
 
 import level.Level;
 import level.platforms.MovingPlatform;
@@ -18,7 +23,7 @@ import level.platforms.Platform;
  * @author James Talbert
  *
  */
-public class Game implements KeyListener {
+public class Game implements Action {
 
 	/**
 	 * The system time when the {@link #update()} method was last called.
@@ -29,6 +34,8 @@ public class Game implements KeyListener {
 	 * The current {@link Level} being played.
 	 */
 	protected Level level;
+	
+	private boolean paused = false;
 
 	/**
 	 * Starts a new Game with the given level file.
@@ -54,7 +61,7 @@ public class Game implements KeyListener {
 	 * @param fileName
 	 *            the level text file to load into {@link #level}.
 	 */
-	public void loadLevel(String fileName) throws IOException {
+	public void loadLevel(String fileName) {
 		Level temp = level;
 		try {
 			level = new Level(fileName);
@@ -86,8 +93,10 @@ public class Game implements KeyListener {
 	 * level.
 	 */
 	public void update() {
-		level.updateLevel(System.currentTimeMillis() - time);
-		time = System.currentTimeMillis();
+		if (!paused) {
+			level.updateLevel(System.currentTimeMillis() - time);
+			time = System.currentTimeMillis();
+		}
 	}
 
 	/**
@@ -115,17 +124,43 @@ public class Game implements KeyListener {
 
 	// KeyboardListener
 	@Override
-	public void keyTyped(KeyEvent e) {
-
+	public void actionPerformed(ActionEvent e) {
+		System.out.println("Event" + e);
 	}
-
+	
 	@Override
-	public void keyReleased(KeyEvent e) {
-
+	public void setEnabled(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
-
+	
 	@Override
-	public void keyPressed(KeyEvent e) {
-
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void putValue(String key, Object value) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public Object getValue(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		// TODO Auto-generated method stub
+		
 	}
 }
