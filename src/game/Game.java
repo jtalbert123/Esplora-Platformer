@@ -10,6 +10,7 @@ import java.awt.peer.KeyboardFocusManagerPeer;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import level.Level;
@@ -23,7 +24,7 @@ import level.platforms.Platform;
  * @author James Talbert
  *
  */
-public class Game implements Action {
+public class Game extends AbstractAction implements Action {
 
 	/**
 	 * The system time when the {@link #update()} method was last called.
@@ -124,44 +125,9 @@ public class Game implements Action {
 	}
 
 	// KeyboardListener
-	
-	protected boolean isEnabled;
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("Event");
-	}
-	
-	@Override
-	public void setEnabled(boolean b) {
-		isEnabled = b;
-	}
-	
-	@Override
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		// TODO Auto-generated method stub
-	}
-	
-	@Override
-	public void putValue(String key, Object value) {
-		// TODO Auto-generated method stub
-		System.out.println("putValue");
-	}
-	
-	@Override
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-	
-	@Override
-	public Object getValue(String key) {
-		// TODO Auto-generated method stub
-		System.out.println("getValue");
-		return null;
-	}
-	
-	@Override
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		// TODO Auto-generated method stub
-		
+		System.out.println(e.getActionCommand());
 	}
 }

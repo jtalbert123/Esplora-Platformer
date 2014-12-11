@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -87,15 +88,10 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 				* Platform.PLATFORM_HEIGHT);
 		add(canvas);
 		
-		InputMap keyStrokes = this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		keyStrokes.put(KeyStroke.getKeyStroke("ENTER"), 1);
+		InputMap keyStrokes = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, 0), "semicolon");
 		ActionMap keyActions = this.getActionMap();
-		keyActions.put(1, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getActionCommand());
-            }
-        });
+		keyActions.put("semicolon", game);
 	}
 
 	/**
