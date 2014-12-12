@@ -344,4 +344,24 @@ public class MovingPlatform extends Platform {
 			return Direction.RIGHT;
 		}
 	}
+	
+	public double getXVelocity() {
+		if (direction == Direction.UP || direction == Direction.DOWN) {
+			return 0;
+		} else if (direction == Direction.RIGHT) {
+			return speed;
+		} else {
+			return -speed;
+		}
+	}
+	
+	public double getYVelocity() {
+		if (direction == Direction.RIGHT || direction == Direction.LEFT) {
+			return 0;
+		} else if (direction == Direction.UP) {
+			return speed;
+		} else {
+			return -speed;
+		}
+	}
 }

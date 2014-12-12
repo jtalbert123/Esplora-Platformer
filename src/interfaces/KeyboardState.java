@@ -58,14 +58,14 @@ public class KeyboardState extends AbstractAction {
 	
 	public boolean isKeyUp(String key) {
 		if (type != 3) {
-			throw new IllegalStateException();
+			return !localState.contains(key);
 		}
 		return !localState.contains(key);
 	}
 	
 	public boolean isKeyDown(String key) {
 		if (type != 3) {
-			throw new IllegalStateException();
+			return localState.contains(key);
 		}
 		return localState.contains(key);
 	}

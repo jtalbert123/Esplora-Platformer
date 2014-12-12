@@ -124,6 +124,9 @@ public class Game {
 			}
 			paused = !paused;
 		}
+		if (!avatar.isAlive()) {
+			System.exit(0);
+		}
 		if (!paused) {
 			long elapsedTime = System.currentTimeMillis() - time;
 			level.updateLevel(elapsedTime);

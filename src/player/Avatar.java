@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 import level.Level;
+import level.platforms.MovingPlatform;
 
 public class Avatar implements Collidable, Drawable {
 
@@ -24,9 +25,9 @@ public class Avatar implements Collidable, Drawable {
 	protected double xDampening;
 	protected double yDampening;
 
-	boolean canJump = false;
+	protected boolean canJump = false;
 
-	boolean isAlive;
+	protected boolean isAlive;
 
 	public Avatar() {
 		x = 0;
@@ -68,34 +69,57 @@ public class Avatar implements Collidable, Drawable {
 	public void update(long elapsedTime, Level level) {
 		double time = elapsedTime / 1000.0;
 		KeyboardState kb = KeyboardState.getKeyboardState();
-		if (kb.isKeyDown("w")) {
-			if (canJump)
-				yVelocity = -9.8/2.0;
-			canJump = false;
-		}
-		if (kb.isKeyDown("a") && kb.isKeyUp("d")) {
-			xAcceleration = -4;
-		} else if (kb.isKeyDown("d") && kb.isKeyUp("a")) {
-			xAcceleration = 4;
-		} else {
-			xAcceleration = 0;
-		}
 
-		Collidable c = onGround(level); 
-		if (c != null) {
-			y = (c.getRect().getMinY() - HEIGHT)/Level.CELL_HEIGHT;
-			yAcceleration = 0;
-			yVelocity = Math.min(yVelocity, 0);
-			canJump = true;
-		} else {
-			yAcceleration = 9.8;
+		if (isAlive) {
+			if (kb.isKeyDown("w")) {
+				if (canJump)
+					yVelocity = -9.8 / 2.0;
+				canJump = false;
+			}
+			if (kb.isKeyDown("a") && kb.isKeyUp("d")) {
+				xAcceleration = -9;
+
+			} else if (kb.isKeyDown("d") && kb.isKeyUp("a")) {
+				xAcceleration = 9;
+			} else {
+				xAcceleration = 0;
+			}
+
+			if (x < 0) {
+				xVelocity = 0;
+				x = 0;
+			} else if (x > level.width) {
+				xVelocity = 0;
+				x = level.width;
+			}
+			if (y > level.height + 1) {
+				isAlive = false;
+			}
+			double tempYV = 0;
+			double tempXV = 0;
+			Collidable c = onGround(level);
+			if (c != null) {
+				y = (c.getRect().getMinY() - HEIGHT + 1) / ((double)Level.CELL_HEIGHT);
+				yAcceleration = 0;
+				yVelocity = Math.min(yVelocity, 0);
+				if (MovingPlatform.class.isInstance(c)) {
+					tempXV = ((MovingPlatform)c).getXVelocity();
+					tempYV = ((MovingPlatform)c).getYVelocity();
+				}
+				canJump = true;
+			} else {
+				yAcceleration = 9.8;
+			}
+//
+			tempXV += xVelocity;
+			tempYV += yVelocity;
+
+			x += tempXV * time;
+			xVelocity = xVelocity * (1 - xDampening) + xAcceleration * time;
+
+			y += tempYV * time;
+			yVelocity = yVelocity * (1 - yDampening) + yAcceleration * time;
 		}
-
-		x += xVelocity * time;
-		xVelocity = xVelocity * (1 - xDampening) + xAcceleration * time;
-
-		y += yVelocity * time;
-		yVelocity = yVelocity * (1 - yDampening) + yAcceleration * time;
 	}
 
 	private Collidable onGround(Level level) {
@@ -125,9 +149,9 @@ public class Avatar implements Collidable, Drawable {
 	@Override
 	public void draw(Graphics g) {
 		g.setColor(Color.green);
-		g.fillOval(0, 0, WIDTH-1, HEIGHT-1);
+		g.fillOval(0, 0, WIDTH - 1, HEIGHT - 1);
 		g.setColor(Color.black);
-		g.drawRect(0, 0, WIDTH-1, HEIGHT-1);
+		g.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
 	}
 
 	@Override
@@ -146,5 +170,9 @@ public class Avatar implements Collidable, Drawable {
 		// TODO we will need to decide what to do here. (should platforms bounce
 		// off the player).
 		return true;
+	}
+	
+	public boolean isAlive() {
+		return isAlive;
 	}
 }
