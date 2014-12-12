@@ -12,7 +12,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -24,7 +23,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
-import level.platforms.Platform;
+import level.Level;
 
 /**
  * This class handles visualizing/running the {@link Game}. This should be added
@@ -51,12 +50,12 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 * , and {@link Game#draw(Graphics) draw()} methods.
 	 */
 	Game game;
-	
+
 	/**
 	 * The button to allow the user to select a new level.
 	 */
 	JButton newLevel;
-	
+
 	/**
 	 * The fileChooser to select a new level file.
 	 */
@@ -70,28 +69,54 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 		super(new BorderLayout());
 		fc = new JFileChooser();
 		fc.setFileFilter(new FileFilter() {
-			
+
 			@Override
 			public String getDescription() {
 				return "Level files (.txt)";
 			}
-			
+
 			@Override
 			public boolean accept(File f) {
 				return f.getName().endsWith(".txt") || f.isDirectory();
 			}
 		});
+		setKeyBindings();
 		game = new Game("level1.txt");
 		canvas = new Canvas();
 		Rectangle r = game.getBounds();
-		canvas.setSize((r.width + 1) * Platform.PLATFORM_WIDTH, (r.height + 1)
-				* Platform.PLATFORM_HEIGHT);
+		canvas.setSize((r.width + 1) * Level.CELL_WIDTH, (r.height + 1)
+				* Level.CELL_HEIGHT);
 		add(canvas);
+	}
+	
+	private void setKeyBindings() {
+
+		KeyboardState keyPress = KeyboardState.getKeyPressListner();
+		KeyboardState keyRelease = KeyboardState.getKeyreleaseListner();
+//		this.addKeyListener(kbUpdater);
 		
-		InputMap keyStrokes = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "pause");
+		InputMap keyStrokes = this
+				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		//listeners
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "key released");
+		
 		ActionMap keyActions = this.getActionMap();
-		keyActions.put("pause", game);
+		//actions
+		keyActions.put("key pressed", keyPress);
+		keyActions.put("key released", keyRelease);
 	}
 
 	/**
@@ -105,7 +130,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 				try {
 					game.loadLevel(fc.getSelectedFile().getCanonicalPath());
 				} catch (IOException e1) {
-					
+
 				}
 			}
 		}
@@ -154,6 +179,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	/**
 	 * Shows a new {@link JFrame} object with a {@link Interface1} inside. Then
 	 * runs the {@link Interface1} in a new {@link Thread}.
+	 * 
 	 * @see #createAndShowGUI()
 	 * 
 	 * @param args

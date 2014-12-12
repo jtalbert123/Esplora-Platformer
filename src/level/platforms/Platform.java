@@ -1,9 +1,10 @@
 package level.platforms;
 
+import game.Collidable;
+import game.Drawable;
+
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -15,19 +16,19 @@ import level.Level;
  * @author James Talbert
  *
  */
-public abstract class Platform {
+public abstract class Platform implements Collidable, Drawable {
 
 	/**
 	 * The width of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int PLATFORM_WIDTH = 20 * 2;
+	public static final int PLATFORM_WIDTH = Level.CELL_WIDTH - 1;
 
 	/**
 	 * The height of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int PLATFORM_HEIGHT = 15 * 2;
+	public static final int PLATFORM_HEIGHT = Level.CELL_HEIGHT - 1;
 
 	/**
 	 * The logical horizontal position of a platform (from left). Use
@@ -97,8 +98,8 @@ public abstract class Platform {
 	 * @param y
 	 * @return the platform specified by the token
 	 */
-	public static Platform getPlatform(String token, int x, int y) {
-		Object objToUse = null;
+	public static Collidable getPlatform(String token, int x, int y) {
+		Platform objToUse = null;
 		// System.out.println(str);
 		for (Pattern p : types.keySet()) {
 			// System.out.println("\t" + p);
@@ -110,28 +111,7 @@ public abstract class Platform {
 		if (objToUse == null) {
 			return null;
 		}
-		try {
-			Method m = objToUse.getClass().getMethod("makePlatform",
-					new Class[] { String.class, Integer.class, Integer.class });
-			return (Platform) m.invoke(objToUse, token, x, y);
-		} catch (NoSuchMethodException e) {
-			throw new ClassCastException(String.format(
-					"%s does not contain makePlatform.", objToUse.getClass()
-							.getName()));
-		} catch (SecurityException e) {
-			throw new ClassCastException(String.format(
-					"The makePlatform method of %s could not be accessed.",
-					objToUse.getClass().getName()));
-		} catch (IllegalAccessException e) {
-			throw new ClassCastException(String.format(
-					"The makePlatform method of %s could not be accessed.",
-					objToUse.getClass().getName()));
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return objToUse.makePlatform(token, x, y);
 	}
 
 	/**
@@ -144,34 +124,36 @@ public abstract class Platform {
 	 *            the rectangle that is being checked.
 	 * @return true if they intersect in a way that would illicit a reaction
 	 *         from <b>this</b> Platform.
+	 * @deprecated use isCollidingWith(Collidable c)
 	 */
 	public boolean isCollidingWith(Rectangle r) {
 		return getRect().intersects(r);
 	}
 
-	/**
-	 * Checks for a collision with the given platform, use when evaluating any
-	 * Platform collisions as it allows for more detailed analysis.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param p
-	 *            the platform that may be colliding with <b>this</b>
-	 * @return true if they intersect in a way that would illicit a reaction
-	 *         from <b>this</b> Platform.
-	 * @see #isCollidingWith(Rectangle)
+	 * @see level.platforms.Collidable#isCollidingWith(level.platforms.Platform)
 	 */
-	public boolean isCollidingWith(Platform p) {
-		return p.tangible && getRect().intersects(p.getRect());
+	@Override
+	public boolean isCollidingWith(Collidable c) {
+		return c.tangible() && getRect().intersects(c.getRect());
 	}
 
-	/**
-	 * Gets the bounding {@link Rectangle} of the Platform.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return the bounding rectangle of the platform in pixels <b>not logical grid spaces</b>.
+	 * @see level.platforms.Collidable#getRect()
 	 */
+	@Override
 	public Rectangle getRect() {
-		return new Rectangle((int) (x * PLATFORM_WIDTH),
-				(int) (y * PLATFORM_HEIGHT), (int) PLATFORM_WIDTH,
+		return new Rectangle((int) (x * Level.CELL_WIDTH),
+				(int) (y * Level.CELL_HEIGHT), (int) PLATFORM_WIDTH,
 				(int) PLATFORM_HEIGHT);
+	}
+
+	public boolean tangible() {
+		return tangible;
 	}
 
 	/**
@@ -186,31 +168,15 @@ public abstract class Platform {
 	 *            the location that the token occurred in the level file.
 	 * @return the new platform.
 	 */
-	public abstract Platform makePlatform(String str, Integer x, Integer y);
+	public abstract Collidable makePlatform(String str, Integer x, Integer y);
 
 	@Override
 	public String toString() {
 		return String.format("Platform at (%f, %f)", x, y);
 	}
 
-	/**
-	 * draws the representation of the object in the top left corner of the
-	 * provided graphics object
-	 * 
-	 * @param g
-	 *            the graphics object to be used
-	 */
+	
 	public abstract void draw(Graphics g);
 
-	/**
-	 * Updates the Platform object. Implementations will vary greatly among
-	 * subclasses.
-	 * 
-	 * @param currentTime
-	 *            the current system time, not the interval.
-	 * @param level
-	 *            the level the platform is in, necessary for collision
-	 *            checking.
-	 */
 	public abstract void update(long currentTime, Level level);
 }

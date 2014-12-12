@@ -1,5 +1,7 @@
 package level.platforms;
 
+import game.Collidable;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -26,7 +28,7 @@ public class Spawn extends Platform {
 	}
 	
 	@Override
-	public Platform makePlatform(String str, Integer x, Integer y) {
+	public Collidable makePlatform(String str, Integer x, Integer y) {
 		//System.out.println("Creating spawn object.");
 		return new Spawn(x, y);
 	}

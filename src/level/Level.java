@@ -1,5 +1,7 @@
 package level;
 
+import game.Collidable;
+import game.Drawable;
 import game.Game;
 
 import java.io.File;
@@ -16,14 +18,19 @@ import level.platforms.Platform;
 
 /**
  * A single level of a platformer {@link Game}.
+ * 
  * @author James Talbert
  *
  */
-public class Level implements Iterable<Platform> {
+public class Level implements Iterable<Collidable> {
+
+	public static final int CELL_WIDTH = 20 * 2;
+	public static final int CELL_HEIGHT = 15 * 2;
+
 	/**
 	 * The list of {@link level.platforms.Platform Platforms} in the level.
 	 */
-	private Platform[] elements;
+	private Collidable[] elements;
 
 	/**
 	 * The width of the level, specified explicitly in the file.
@@ -74,10 +81,10 @@ public class Level implements Iterable<Platform> {
 			throw new IOException(
 					"The first line of the file must be of the form 'width: # height #'");
 		}
-		ArrayList<Platform> platforms = new ArrayList<>();
+		ArrayList<Collidable> platforms = new ArrayList<>();
 		int row = 0;
 		while (text.hasNextLine()) {
-			Platform p;
+			Collidable p;
 			line = text.nextLine();
 			if (line.matches(validLine)) {
 				Matcher validate = token.matcher(line);
@@ -107,13 +114,13 @@ public class Level implements Iterable<Platform> {
 	 * @see Game#update()
 	 */
 	public void updateLevel(long milliseconds) {
-		for (Platform p : elements) {
+		for (Collidable p : elements) {
 			p.update(milliseconds, this);
 		}
 	}
 
 	@Override
-	public Iterator<Platform> iterator() {
+	public Iterator<Collidable> iterator() {
 		return Arrays.asList(elements).iterator();
 	}
 
@@ -132,7 +139,7 @@ public class Level implements Iterable<Platform> {
 	@SuppressWarnings("unchecked")
 	public <PlatformType> PlatformType[] getAll(Class<PlatformType> type) {
 		ArrayList<PlatformType> subset = new ArrayList<>();
-		for (Platform p : elements) {
+		for (Collidable p : elements) {
 			if (type.isInstance(p)) {
 				subset.add((PlatformType) p);
 			}

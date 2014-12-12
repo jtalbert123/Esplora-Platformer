@@ -1,21 +1,17 @@
 package game;
 
+import interfaces.KeyboardState;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.peer.KeyboardFocusManagerPeer;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 import level.Level;
 import level.platforms.MovingPlatform;
 import level.platforms.Platform;
+import level.platforms.Spawn;
+import player.Avatar;
 
 /**
  * This class represents a single game of the platformer being played. it stores
@@ -24,7 +20,7 @@ import level.platforms.Platform;
  * @author James Talbert
  *
  */
-public class Game extends AbstractAction implements Action {
+public class Game {
 
 	/**
 	 * The system time when the {@link #update()} method was last called.
@@ -36,8 +32,21 @@ public class Game extends AbstractAction implements Action {
 	 */
 	protected Level level;
 
+	/**
+	 * Whether the game is paused or not. Initially false (not paused).
+	 */
 	private boolean paused = false;
-
+	
+	/**
+	 * The on-screen character.
+	 */
+	protected Avatar avatar;
+	
+	/**
+	 * The state of the keyboard after the last call to update.
+	 */
+	KeyboardState oldKeyboard;
+	
 	/**
 	 * Starts a new Game with the given level file.
 	 * 
@@ -45,13 +54,21 @@ public class Game extends AbstractAction implements Action {
 	 *            the name of the file to use as a source for {@link #level}.
 	 */
 	public Game(String fileName) {
+		oldKeyboard = KeyboardState.getKeyboardState();
 		try {
 			level = new Level(fileName);
+			Spawn s = getRandomSpawn();
+			avatar = new Avatar(s.getRect().x/Level.CELL_WIDTH, s.getRect().y/Level.CELL_HEIGHT);
 		} catch (IOException e) {
 			level = null;
 			e.printStackTrace();
 		}
 		time = System.currentTimeMillis();
+	}
+	
+	private Spawn getRandomSpawn() {
+		Object[] array = level.getAll(Spawn.class);
+		return (Spawn) array[((int)(Math.random()*array.length))];
 	}
 
 	/**
@@ -66,6 +83,8 @@ public class Game extends AbstractAction implements Action {
 		Level temp = level;
 		try {
 			level = new Level(fileName);
+			Spawn s = getRandomSpawn();
+			avatar = new Avatar(s.getRect().x/Level.CELL_WIDTH, s.getRect().y/Level.CELL_HEIGHT);
 		} catch (IOException e) {
 			level = temp;
 			e.printStackTrace();
@@ -82,12 +101,14 @@ public class Game extends AbstractAction implements Action {
 	 *            into {@link #draw(Graphics)} on it's last call.
 	 */
 	public void clearItems(Graphics g) {
-		for (Platform p : level) {
+		for (Collidable p : level) {
 			if (p.getClass() != Platform.class) {
 				Rectangle r = p.getRect();
 				g.clearRect(r.x, r.y, r.width, r.height);
 			}
 		}
+		Rectangle r = avatar.getRect();
+		g.clearRect(r.x, r.y, r.width, r.height);
 	}
 
 	/**
@@ -95,28 +116,43 @@ public class Game extends AbstractAction implements Action {
 	 * level.
 	 */
 	public void update() {
-		// System.out.println("Update: " + System.currentTimeMillis());
+		//check keyboard state deal with it.
+		KeyboardState keyboard = KeyboardState.getKeyboardState();
+		if (keyboard.isKeyDown("p") && oldKeyboard.isKeyUp("p")) {
+			if (paused) {
+				time = System.currentTimeMillis();
+			}
+			paused = !paused;
+		}
 		if (!paused) {
-			level.updateLevel(System.currentTimeMillis() - time);
+			long elapsedTime = System.currentTimeMillis() - time;
+			level.updateLevel(elapsedTime);
+			avatar.update(elapsedTime, level);
 			time = System.currentTimeMillis();
 		}
+		oldKeyboard = keyboard;
 	}
 
 	/**
 	 * Calls each item to draw it's representation. each {@link Platform} is
-	 * limited to it's bounding rectangls for drawing.
+	 * limited to it's bounding rectangles for drawing.
 	 * 
 	 * @param g
 	 *            the {@link Graphics} object to draw on.
 	 */
 	public void draw(Graphics g) {
-		for (Platform p : level) {
+		for (Drawable p : level.getAll(Drawable.class)) {
 			g.setColor(Color.black);
 			Rectangle r = p.getRect();
 			Graphics temp = g.create(r.x, r.y, r.width, r.height);
 			p.draw(temp);
 			temp.dispose();
 		}
+		g.setColor(Color.black);
+		Rectangle r = avatar.getRect();
+		Graphics temp = g.create(r.x, r.y, r.width, r.height);
+		avatar.draw(temp);
+		temp.dispose();
 	}
 
 	/**
@@ -126,19 +162,5 @@ public class Game extends AbstractAction implements Action {
 	 */
 	public Rectangle getBounds() {
 		return new Rectangle(level.width, level.height);
-	}
-
-	// KeyboardListener
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("p")) {
-			if (paused) {
-				time = System.currentTimeMillis();
-				paused = false;
-			} else {
-				paused = true;
-			}
-		}
-		System.out.println(e.getActionCommand());
 	}
 }

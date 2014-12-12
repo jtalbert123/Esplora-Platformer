@@ -1,5 +1,7 @@
 package level.platforms;
 
+import game.Collidable;
+
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -7,7 +9,7 @@ import level.Level;
 
 public class BasicPlatform extends Platform {
 
-	public Platform makePlatform(String str, Integer x, Integer y) {
+	public Collidable makePlatform(String str, Integer x, Integer y) {
 		return new BasicPlatform(x, y, 0, true);
 	}
 

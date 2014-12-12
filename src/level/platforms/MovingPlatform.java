@@ -1,5 +1,7 @@
 package level.platforms;
 
+import game.Collidable;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -76,7 +78,7 @@ public class MovingPlatform extends Platform {
 	 * @see MovingPlatform#speed
 	 */
 	@Override
-	public Platform makePlatform(String str, Integer x, Integer y) {
+	public Collidable makePlatform(String str, Integer x, Integer y) {
 		Scanner scan = new Scanner(str.substring(1, str.length() - 1));
 		scan.useDelimiter(" ");
 		String axis = scan.next();
@@ -116,13 +118,13 @@ public class MovingPlatform extends Platform {
 	 * @see Platform#isCollidingWith(Platform)
 	 */
 	@Override
-	public boolean isCollidingWith(Platform p) {
-		boolean intersects = super.isCollidingWith(p);
+	public boolean isCollidingWith(Collidable c) {
+		boolean intersects = super.isCollidingWith(c);
 		if (!intersects) {
 			return false;
 		}
 		Rectangle thisRect = this.getRect();
-		Rectangle pRect = p.getRect();
+		Rectangle pRect = c.getRect();
 		double xDisplacement = pRect.getCenterX() - thisRect.getCenterX();
 		double yDisplacement = pRect.getCenterY() - thisRect.getCenterY();
 		double angle = Math.atan2(-yDisplacement, xDisplacement);
@@ -160,8 +162,8 @@ public class MovingPlatform extends Platform {
 	 *            the level that the MovingPlatform is in.
 	 * @return the platform that is in the way, null if there is no blockage.
 	 */
-	protected Platform leftBlocked(Level level) {
-		for (Platform p : level) {
+	protected Collidable leftBlocked(Level level) {
+		for (Collidable p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p))
 					return p;
@@ -178,8 +180,8 @@ public class MovingPlatform extends Platform {
 	 *            the level that the MovingPlatform is in.
 	 * @return the platform that is in the way, null if there is no blockage.
 	 */
-	protected Platform rightBlocked(Level level) {
-		for (Platform p : level) {
+	protected Collidable rightBlocked(Level level) {
+		for (Collidable p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p))
 					return p;
@@ -196,8 +198,8 @@ public class MovingPlatform extends Platform {
 	 *            the level that the MovingPlatform is in.
 	 * @return the platform that is in the way, null if there is no blockage.
 	 */
-	protected Platform downBlocked(Level level) {
-		for (Platform p : level) {
+	protected Collidable downBlocked(Level level) {
+		for (Collidable p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p)) {
 					return p;
@@ -215,8 +217,8 @@ public class MovingPlatform extends Platform {
 	 *            the level that the MovingPlatform is in.
 	 * @return the platform that is in the way, null if there is no blockage.
 	 */
-	protected Platform upBlocked(Level level) {
-		for (Platform p : level) {
+	protected Collidable upBlocked(Level level) {
+		for (Collidable p : level) {
 			if (p != this) {
 				if (this.isCollidingWith(p)) {
 					return p;
@@ -257,8 +259,8 @@ public class MovingPlatform extends Platform {
 	 *            the level the MovingPlatform is in.
 	 * @return the platform that <b>this</b> hit (or null).
 	 */
-	private Platform updateDir(Level level) {
-		Platform blocking = null;
+	private Collidable updateDir(Level level) {
+		Collidable blocking = null;
 		if (direction == Direction.UP) {
 			blocking = upBlocked(level);
 			if (y <= 0 || blocking != null) {
