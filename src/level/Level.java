@@ -14,7 +14,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import player.Avatar;
 import level.platforms.Platform;
+import level.platforms.Spawn;
 
 /**
  * A single level of a platformer {@link Game}.
@@ -41,6 +43,16 @@ public class Level implements Iterable<Collidable> {
 	 * The height of the level, specified explicitly in the file.
 	 */
 	public int height;
+	
+	/**
+	 * The on-screen character
+	 */
+	private Avatar character;
+	
+	/**
+	 * The game this level is a part of.
+	 */
+	private Game game;
 
 	/**
 	 * matches any non { or } character, or any set of characters contained by {
@@ -63,7 +75,8 @@ public class Level implements Iterable<Collidable> {
 	 *             if the file could not be found or if the file did not specify
 	 *             a width and height.
 	 */
-	public Level(String fileName) throws IOException {
+	public Level(String fileName, Game game) throws IOException {
+		this.game = game;
 		File file = new File(fileName);
 		if (!file.exists())
 			throw new FileNotFoundException();
@@ -102,7 +115,8 @@ public class Level implements Iterable<Collidable> {
 			}
 		}
 		text.close();
-		elements = platforms.toArray(new Platform[platforms.size()]);
+		elements = platforms.toArray(new Collidable[platforms.size() + 1]);
+		spawn();
 	}
 
 	/**
@@ -114,6 +128,8 @@ public class Level implements Iterable<Collidable> {
 	 * @see Game#update()
 	 */
 	public void updateLevel(long milliseconds) {
+		if (!character.isAlive())
+			game.onDeath();
 		for (Collidable p : elements) {
 			p.update(milliseconds, this);
 		}
@@ -149,6 +165,17 @@ public class Level implements Iterable<Collidable> {
 			array[i] = subset.get(i);
 		}
 		return array;
+	}
+	
+	public void spawn() {
+		Object[] array = getAll(Spawn.class);
+		Spawn s = (Spawn) array[((int)(Math.random()*array.length))];
+		character = new Avatar(s.getRect().getX()/CELL_WIDTH, s.getRect().getX()/CELL_WIDTH);
+		elements[elements.length-1] = (Collidable)character;
+	}
+	
+	public Avatar getAvatar() {
+		return character;
 	}
 	/*
 	public static void main(String[] args) throws IOException {

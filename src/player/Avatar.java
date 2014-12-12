@@ -41,7 +41,7 @@ public class Avatar implements Collidable, Drawable {
 		isAlive = true;
 	}
 
-	public Avatar(int x, int y) {
+	public Avatar(double x, double y) {
 		this.x = x;
 		this.y = y;
 		xVelocity = 0;
@@ -53,7 +53,7 @@ public class Avatar implements Collidable, Drawable {
 		isAlive = true;
 	}
 
-	public Avatar(int x, int y, boolean alive) {
+	public Avatar(double x, double y, boolean alive) {
 		this.x = x;
 		this.y = y;
 		xVelocity = 0;
@@ -73,7 +73,7 @@ public class Avatar implements Collidable, Drawable {
 		if (isAlive) {
 			if (kb.isKeyDown("w")) {
 				if (canJump)
-					yVelocity = -9.8 / 2.0;
+					yVelocity = -9.8 / 1.5;
 				canJump = false;
 			}
 			if (kb.isKeyDown("a") && kb.isKeyUp("d")) {
@@ -97,20 +97,60 @@ public class Avatar implements Collidable, Drawable {
 			}
 			double tempYV = 0;
 			double tempXV = 0;
-			Collidable c = onGround(level);
-			if (c != null) {
-				y = (c.getRect().getMinY() - HEIGHT + 1) / ((double)Level.CELL_HEIGHT);
-				yAcceleration = 0;
+			Collidable cBelow = platformBelow(level);
+			if (cBelow != null) {
+				y = (cBelow.getRect().getMinY() - HEIGHT + 1)
+						/ ((double) Level.CELL_HEIGHT);
+				yAcceleration = Math.min(yAcceleration, 0);
 				yVelocity = Math.min(yVelocity, 0);
-				if (MovingPlatform.class.isInstance(c)) {
-					tempXV = ((MovingPlatform)c).getXVelocity();
-					tempYV = ((MovingPlatform)c).getYVelocity();
+				if (MovingPlatform.class.isInstance(cBelow)) {
+					tempXV = ((MovingPlatform) cBelow).getXVelocity();
+					tempYV = ((MovingPlatform) cBelow).getYVelocity();
 				}
 				canJump = true;
 			} else {
 				yAcceleration = 9.8;
 			}
-//
+
+			Collidable cAbove = platformAbove(level);
+			if (cAbove != null) {
+				if (MovingPlatform.class.isInstance(cAbove))
+					yVelocity = Math.max(yVelocity,
+							((MovingPlatform) cAbove).getYVelocity());
+				else
+					yVelocity = Math.max(yVelocity, 0);
+
+				yAcceleration = Math.max(yAcceleration, 0);
+				y = cAbove.getRect().getMaxY() / Level.CELL_HEIGHT;
+			}
+
+			Collidable cRight = platformRight(level);
+			if (cRight != null) {
+				if (MovingPlatform.class.isInstance(cRight))
+					xVelocity = Math.min(xVelocity,
+							((MovingPlatform) cRight).getXVelocity());
+				else
+					xVelocity = Math.min(xVelocity, 0);
+				x = (cRight.getRect().getMinX() - WIDTH) / Level.CELL_WIDTH;
+			}
+
+			Collidable cLeft = platformLeft(level);
+			if (cLeft != null) {
+				if (MovingPlatform.class.isInstance(cLeft))
+					xVelocity = Math.max(xVelocity,
+							((MovingPlatform) cLeft).getXVelocity());
+				else
+					xVelocity = Math.max(xVelocity, 0);
+				x = (cLeft.getRect().getMaxX()) / Level.CELL_WIDTH;
+			}
+
+			if (cLeft != null && cRight != null) {
+				isAlive = false;
+			}
+			if (cAbove != null && cBelow != null) {
+				isAlive = false;
+			}
+
 			tempXV += xVelocity;
 			tempYV += yVelocity;
 
@@ -122,26 +162,102 @@ public class Avatar implements Collidable, Drawable {
 		}
 	}
 
-	private Collidable onGround(Level level) {
+	private Collidable platformAbove(Level level) {
 		for (Collidable c : level) {
-			if (this.isCollidingWith(c)) {
-				Rectangle thisRect = getRect();
-				Rectangle cRect = c.getRect();
+			if (c != this)
+				if (this.isCollidingWith(c)) {
+					Rectangle thisRect = getRect();
+					Rectangle cRect = c.getRect();
 
-				double xDisplacement = cRect.getCenterX()
-						- thisRect.getCenterX();
-				double yDisplacement = cRect.getCenterY()
-						- thisRect.getCenterY();
-				double angle = Math.atan2(-yDisplacement, xDisplacement);
+					double xDisplacement = cRect.getCenterX()
+							- thisRect.getCenterX();
+					double yDisplacement = cRect.getCenterY()
+							- thisRect.getCenterY();
+					double angle = Math.atan2(-yDisplacement, xDisplacement);
 
-				double angleLRCorner = Math.atan2(-thisRect.height,
-						thisRect.width);
-				double angleLLCorner = Math.atan2(-thisRect.height,
-						-thisRect.width);
-				if (angle <= angleLRCorner && angle >= angleLLCorner) {
-					return c;
+					double angleURCorner = Math.atan2(thisRect.height,
+							thisRect.width);
+					double angleULCorner = Math.atan2(thisRect.height,
+							-thisRect.width);
+					if (angle <= angleULCorner && angle >= angleURCorner) {
+						return c;
+					}
 				}
-			}
+		}
+		return null;
+	}
+
+	private Collidable platformBelow(Level level) {
+		for (Collidable c : level) {
+			if (c != this)
+				if (this.isCollidingWith(c)) {
+					Rectangle thisRect = getRect();
+					Rectangle cRect = c.getRect();
+
+					double xDisplacement = cRect.getCenterX()
+							- thisRect.getCenterX();
+					double yDisplacement = cRect.getCenterY()
+							- thisRect.getCenterY();
+					double angle = Math.atan2(-yDisplacement, xDisplacement);
+
+					double angleLRCorner = Math.atan2(-thisRect.height,
+							thisRect.width);
+					double angleLLCorner = Math.atan2(-thisRect.height,
+							-thisRect.width);
+					if (angle <= angleLRCorner && angle >= angleLLCorner) {
+						return c;
+					}
+				}
+		}
+		return null;
+	}
+
+	private Collidable platformRight(Level level) {
+		for (Collidable c : level) {
+			if (c != this)
+				if (this.isCollidingWith(c)) {
+					Rectangle thisRect = getRect();
+					Rectangle cRect = c.getRect();
+
+					double xDisplacement = cRect.getCenterX()
+							- thisRect.getCenterX();
+					double yDisplacement = cRect.getCenterY()
+							- thisRect.getCenterY();
+					double angle = Math.atan2(-yDisplacement, xDisplacement);
+
+					double angleURCorner = Math.atan2(thisRect.height,
+							thisRect.width);
+					double angleLRCorner = Math.atan2(-thisRect.height,
+							thisRect.width);
+					if (angle <= angleURCorner && angle >= angleLRCorner) {
+						return c;
+					}
+				}
+		}
+		return null;
+	}
+
+	private Collidable platformLeft(Level level) {
+		for (Collidable c : level) {
+			if (c != this)
+				if (this.isCollidingWith(c)) {
+					Rectangle thisRect = getRect();
+					Rectangle cRect = c.getRect();
+
+					double xDisplacement = cRect.getCenterX()
+							- thisRect.getCenterX();
+					double yDisplacement = cRect.getCenterY()
+							- thisRect.getCenterY();
+					double angle = Math.atan2(-yDisplacement, xDisplacement);
+
+					double angleULCorner = Math.atan2(thisRect.height,
+							-thisRect.width);
+					double angleLLCorner = Math.atan2(-thisRect.height,
+							-thisRect.width);
+					if (angle <= angleLLCorner || angle >= angleULCorner) {
+						return c;
+					}
+				}
 		}
 		return null;
 	}
@@ -169,9 +285,9 @@ public class Avatar implements Collidable, Drawable {
 	public boolean tangible() {
 		// TODO we will need to decide what to do here. (should platforms bounce
 		// off the player).
-		return true;
+		return false;
 	}
-	
+
 	public boolean isAlive() {
 		return isAlive;
 	}

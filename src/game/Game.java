@@ -10,8 +10,6 @@ import java.io.IOException;
 import level.Level;
 import level.platforms.MovingPlatform;
 import level.platforms.Platform;
-import level.platforms.Spawn;
-import player.Avatar;
 
 /**
  * This class represents a single game of the platformer being played. it stores
@@ -36,17 +34,17 @@ public class Game {
 	 * Whether the game is paused or not. Initially false (not paused).
 	 */
 	private boolean paused = false;
-	
+
 	/**
-	 * The on-screen character.
+	 * Is the game over.
 	 */
-	protected Avatar avatar;
-	
+	boolean gameOver;
+
 	/**
 	 * The state of the keyboard after the last call to update.
 	 */
 	KeyboardState oldKeyboard;
-	
+
 	/**
 	 * Starts a new Game with the given level file.
 	 * 
@@ -56,19 +54,12 @@ public class Game {
 	public Game(String fileName) {
 		oldKeyboard = KeyboardState.getKeyboardState();
 		try {
-			level = new Level(fileName);
-			Spawn s = getRandomSpawn();
-			avatar = new Avatar(s.getRect().x/Level.CELL_WIDTH, s.getRect().y/Level.CELL_HEIGHT);
+			level = new Level(fileName, this);
 		} catch (IOException e) {
 			level = null;
 			e.printStackTrace();
 		}
 		time = System.currentTimeMillis();
-	}
-	
-	private Spawn getRandomSpawn() {
-		Object[] array = level.getAll(Spawn.class);
-		return (Spawn) array[((int)(Math.random()*array.length))];
 	}
 
 	/**
@@ -82,9 +73,7 @@ public class Game {
 	public void loadLevel(String fileName) {
 		Level temp = level;
 		try {
-			level = new Level(fileName);
-			Spawn s = getRandomSpawn();
-			avatar = new Avatar(s.getRect().x/Level.CELL_WIDTH, s.getRect().y/Level.CELL_HEIGHT);
+			level = new Level(fileName, this);
 		} catch (IOException e) {
 			level = temp;
 			e.printStackTrace();
@@ -107,8 +96,6 @@ public class Game {
 				g.clearRect(r.x, r.y, r.width, r.height);
 			}
 		}
-		Rectangle r = avatar.getRect();
-		g.clearRect(r.x, r.y, r.width, r.height);
 	}
 
 	/**
@@ -116,7 +103,7 @@ public class Game {
 	 * level.
 	 */
 	public void update() {
-		//check keyboard state deal with it.
+		// check keyboard state deal with it.
 		KeyboardState keyboard = KeyboardState.getKeyboardState();
 		if (keyboard.isKeyDown("p") && oldKeyboard.isKeyUp("p")) {
 			if (paused) {
@@ -124,13 +111,9 @@ public class Game {
 			}
 			paused = !paused;
 		}
-		if (!avatar.isAlive()) {
-			System.exit(0);
-		}
 		if (!paused) {
 			long elapsedTime = System.currentTimeMillis() - time;
 			level.updateLevel(elapsedTime);
-			avatar.update(elapsedTime, level);
 			time = System.currentTimeMillis();
 		}
 		oldKeyboard = keyboard;
@@ -151,11 +134,9 @@ public class Game {
 			p.draw(temp);
 			temp.dispose();
 		}
-		g.setColor(Color.black);
-		Rectangle r = avatar.getRect();
-		Graphics temp = g.create(r.x, r.y, r.width, r.height);
-		avatar.draw(temp);
-		temp.dispose();
+		if (gameOver) {
+			g.drawString("Game Over", 0, level.height * Level.CELL_HEIGHT / 2);
+		}
 	}
 
 	/**
@@ -165,5 +146,10 @@ public class Game {
 	 */
 	public Rectangle getBounds() {
 		return new Rectangle(level.width, level.height);
+	}
+
+	public void onDeath() {
+		// paused = true;
+		gameOver = true;
 	}
 }
