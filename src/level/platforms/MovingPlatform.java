@@ -119,14 +119,13 @@ public class MovingPlatform extends Platform {
 	 */
 	@Override
 	public boolean isCollidingWith(Collidable c) {
-		boolean intersects = super.isCollidingWith(c);
-		if (!intersects) {
+		if (!super.isCollidingWith(c)) {
 			return false;
 		}
 		Rectangle thisRect = this.getRect();
-		Rectangle pRect = c.getRect();
-		double xDisplacement = pRect.getCenterX() - thisRect.getCenterX();
-		double yDisplacement = pRect.getCenterY() - thisRect.getCenterY();
+		Rectangle cRect = c.getRect();
+		double xDisplacement = cRect.getCenterX() - thisRect.getCenterX();
+		double yDisplacement = cRect.getCenterY() - thisRect.getCenterY();
 		double angle = Math.atan2(-yDisplacement, xDisplacement);
 
 		double angleURCorner = Math.atan2(thisRect.height, thisRect.width);

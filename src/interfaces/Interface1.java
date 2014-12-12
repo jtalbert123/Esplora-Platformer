@@ -142,7 +142,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	 */
 	public void run() {
 		try {
-			Thread.sleep(100);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -152,7 +152,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 			game.update();
 			game.draw(g);
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1000/60);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

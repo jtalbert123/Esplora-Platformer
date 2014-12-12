@@ -1,12 +1,12 @@
 package level;
 
 import game.Collidable;
-import game.Drawable;
 import game.Game;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -144,6 +144,16 @@ public class Level implements Iterable<Collidable> {
 				subset.add((PlatformType) p);
 			}
 		}
-		return subset.toArray(((PlatformType[]) new Object[subset.size()]));
+		PlatformType[] array = (PlatformType[])Array.newInstance(type, subset.size());
+		for (int i = 0; i < subset.size(); i++) {
+			array[i] = subset.get(i);
+		}
+		return array;
 	}
+	/*
+	public static void main(String[] args) throws IOException {
+		Level l = new Level("level1.txt");
+		System.out.println(l.getAll(MovingPlatform.class));
+	}
+	*/
 }

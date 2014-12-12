@@ -3,8 +3,6 @@ package game;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import level.Level;
-
 public interface Drawable {
 
 	/**
