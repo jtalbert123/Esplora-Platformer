@@ -92,7 +92,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 	private void setKeyBindings() {
 
 		KeyboardState keyPress = KeyboardState.getKeyPressListner();
-		KeyboardState keyRelease = KeyboardState.getKeyreleaseListner();
+		KeyboardState keyRelease = KeyboardState.getKeyReleaseListner();
 //		this.addKeyListener(kbUpdater);
 		
 		InputMap keyStrokes = this
@@ -112,6 +112,9 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 
 		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false), "key pressed");
 		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, true), "key released");
 		
 		ActionMap keyActions = this.getActionMap();
 		//actions

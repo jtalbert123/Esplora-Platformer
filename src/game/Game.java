@@ -105,6 +105,11 @@ public class Game {
 	public void update() {
 		// check keyboard state deal with it.
 		KeyboardState keyboard = KeyboardState.getKeyboardState();
+		if (keyboard.isKeyDown("r") && oldKeyboard.isKeyUp("r")) {
+			loadLevel("level1.txt");
+			paused = false;
+			gameOver = false;
+		}
 		if (keyboard.isKeyDown("p") && oldKeyboard.isKeyUp("p")) {
 			if (paused) {
 				time = System.currentTimeMillis();
@@ -135,10 +140,11 @@ public class Game {
 			temp.dispose();
 		}
 		if (gameOver) {
+			g.clearRect(0, 0, (level.width+1)*Level.CELL_WIDTH, (level.height+1)*Level.CELL_HEIGHT);
 			g.drawString("Game Over", 0, level.height * Level.CELL_HEIGHT / 2);
 		}
 	}
-
+	
 	/**
 	 * Returns the logical height and width of the level.
 	 * 

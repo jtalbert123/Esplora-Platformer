@@ -170,7 +170,7 @@ public class Level implements Iterable<Collidable> {
 	public void spawn() {
 		Object[] array = getAll(Spawn.class);
 		Spawn s = (Spawn) array[((int)(Math.random()*array.length))];
-		character = new Avatar(s.getRect().getX()/CELL_WIDTH, s.getRect().getX()/CELL_WIDTH);
+		character = new Avatar(s.getRect().getX()/CELL_WIDTH, s.getRect().getY()/CELL_WIDTH);
 		elements[elements.length-1] = (Collidable)character;
 	}
 	

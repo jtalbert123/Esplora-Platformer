@@ -99,7 +99,7 @@ public class Avatar implements Collidable, Drawable {
 			double tempXV = 0;
 			Collidable cBelow = platformBelow(level);
 			if (cBelow != null) {
-				y = (cBelow.getRect().getMinY() - HEIGHT + 1)
+				y = (cBelow.getRect().getMinY() - HEIGHT + .9)
 						/ ((double) Level.CELL_HEIGHT);
 				yAcceleration = Math.min(yAcceleration, 0);
 				yVelocity = Math.min(yVelocity, 0);

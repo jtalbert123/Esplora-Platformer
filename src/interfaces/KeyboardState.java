@@ -45,7 +45,7 @@ public class KeyboardState extends AbstractAction {
 		return kbs;
 	}
 
-	static KeyboardState getKeyreleaseListner() {
+	static KeyboardState getKeyReleaseListner() {
 		KeyboardState kbs = new KeyboardState();
 		kbs.type = 2;
 		return kbs;
