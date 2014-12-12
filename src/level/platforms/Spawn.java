@@ -17,19 +17,16 @@ public class Spawn extends Platform {
 		this.x = x;
 		this.y = y;
 		this.type = 3;
-		this.tangible = false;
 	}
 
 	public Spawn() {
 		this.x = -1;
 		this.y = -1;
 		this.type = -1;
-		this.tangible = false;
 	}
 	
 	@Override
 	public Collidable makePlatform(String str, Integer x, Integer y) {
-		//System.out.println("Creating spawn object.");
 		return new Spawn(x, y);
 	}
 	
@@ -43,5 +40,10 @@ public class Spawn extends Platform {
 	@Override
 	public void update(long milliseconds, Level level) {
 		return;
+	}
+	
+	@Override
+	public boolean tangible(Collidable c) {
+		return false;
 	}
 }

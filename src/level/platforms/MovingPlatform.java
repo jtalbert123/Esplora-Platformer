@@ -55,7 +55,6 @@ public class MovingPlatform extends Platform {
 		this.x = x;
 		this.y = y;
 		this.type = 1;
-		this.tangible = true;
 		this.direction = direction;
 		this.speed = speed;
 	}
@@ -64,7 +63,6 @@ public class MovingPlatform extends Platform {
 		this.x = -1;
 		this.y = -1;
 		this.type = -1;
-		this.tangible = false;
 		this.direction = null;
 		this.speed = -1;
 	}
@@ -363,5 +361,10 @@ public class MovingPlatform extends Platform {
 		} else {
 			return -speed;
 		}
+	}
+	
+	@Override
+	public boolean tangible(Collidable c) {
+		return true;
 	}
 }

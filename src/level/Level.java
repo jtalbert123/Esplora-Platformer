@@ -59,7 +59,7 @@ public class Level implements Iterable<Collidable> {
 	 * and }
 	 */
 	private static final Pattern token = Pattern
-			.compile("(([^\\{\\}])|(\\{[^\\{\\} ]+[^\\{\\}]*\\}))");
+			.compile("(?:(?:[^\\{\\}])|(?:\\{[^\\{\\} ]+[^\\{\\}]*\\}))");
 	/**
 	 * matches any number of tokens in a row
 	 */
@@ -103,6 +103,7 @@ public class Level implements Iterable<Collidable> {
 				Matcher validate = token.matcher(line);
 				int column = 0;
 				while (validate.find()) {
+//					System.out.println(validate.group());
 					String token = validate.group();
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)

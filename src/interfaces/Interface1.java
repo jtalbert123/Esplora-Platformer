@@ -81,6 +81,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 			}
 		});
 		setKeyBindings();
+		
 		game = new Game("level1.txt");
 		canvas = new Canvas();
 		Rectangle r = game.getBounds();
@@ -151,7 +152,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 		}
 		Graphics g = canvas.getGraphics();
 		while (true) {
-			game.clearItems(g);
+			game.clearItems();
 			game.update();
 			game.draw(g);
 			try {

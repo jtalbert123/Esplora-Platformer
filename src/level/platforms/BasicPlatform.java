@@ -17,14 +17,12 @@ public class BasicPlatform extends Platform {
 		this.x = x;
 		this.y = y;
 		this.type = type;
-		this.tangible = tangible;
 	}
 
 	protected BasicPlatform() {
 		x = -1;
 		y = -1;
 		type = -1;
-		tangible = false;
 	}
 
 	@Override
@@ -46,5 +44,10 @@ public class BasicPlatform extends Platform {
 
 	public void update(long milliseconds, Level level) {
 		return;
+	}
+	
+	@Override
+	public boolean tangible(Collidable c) {
+		return true;
 	}
 }

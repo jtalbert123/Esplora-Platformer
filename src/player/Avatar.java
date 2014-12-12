@@ -99,7 +99,7 @@ public class Avatar implements Collidable, Drawable {
 			double tempXV = 0;
 			Collidable cBelow = platformBelow(level);
 			if (cBelow != null) {
-				y = (cBelow.getRect().getMinY() - HEIGHT + .9)
+				y = (cBelow.getRect().getMinY() - HEIGHT + 1)
 						/ ((double) Level.CELL_HEIGHT);
 				yAcceleration = Math.min(yAcceleration, 0);
 				yVelocity = Math.min(yVelocity, 0);
@@ -264,15 +264,21 @@ public class Avatar implements Collidable, Drawable {
 
 	@Override
 	public void draw(Graphics g) {
-		g.setColor(Color.green);
-		g.fillOval(0, 0, WIDTH - 1, HEIGHT - 1);
-		g.setColor(Color.black);
-		g.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
+		g.setColor(Color.BLUE);
+		int diameter = Math.min(WIDTH, HEIGHT) - 1;
+		g.fillOval((WIDTH - diameter)/2, (HEIGHT - diameter)/2, diameter, diameter);
 	}
 
 	@Override
 	public boolean isCollidingWith(Collidable c) {
-		return getRect().intersects(c.getRect()) && c.tangible();
+		Rectangle r = c.getRect();
+		if (!MovingPlatform.class.isInstance(c)) {
+			r.width -= 2;
+			r.height -= 2;
+			r.x += 1;
+			r.y += 1;
+		}
+		return getRect().intersects(r) && c.tangible(this);
 	}
 
 	@Override
@@ -282,10 +288,14 @@ public class Avatar implements Collidable, Drawable {
 	}
 
 	@Override
-	public boolean tangible() {
+	public boolean tangible(Collidable c) {
 		// TODO we will need to decide what to do here. (should platforms bounce
 		// off the player).
-		return false;
+		if (MovingPlatform.class.isInstance(c)) {
+			//c is a moving platform (or subclass).
+			return false;
+		}
+		return true;
 	}
 
 	public boolean isAlive() {

@@ -49,13 +49,6 @@ public abstract class Platform implements Collidable, Drawable {
 	protected int type;
 
 	/**
-	 * Weather or not the platform can physically interact with other game
-	 * objects. Example: a tangible platform can collide with a moving platform
-	 * (causing a direction change), an intangible object cannot.
-	 */
-	protected boolean tangible;
-
-	/**
 	 * The list of all types of platforms that can be created from the level
 	 * file. The Regular Expression associated with each one should be specific
 	 * enough that it will match only the items that it can evaluate. The
@@ -81,6 +74,7 @@ public abstract class Platform implements Collidable, Drawable {
 		// Moving platform
 		types.put(MovingPlatform.regex, new MovingPlatform());
 		types.put(Spawn.regex, new Spawn());
+		types.put(MovingPlatformStop.regex, new MovingPlatformStop());
 		// potential regex for teleport (to specific location):
 		// "\\{[Tt](?:ele(?:port)?)? +\\d+ +\\d+\\}"
 	}
@@ -137,7 +131,7 @@ public abstract class Platform implements Collidable, Drawable {
 	 */
 	@Override
 	public boolean isCollidingWith(Collidable c) {
-		return c.tangible() && getRect().intersects(c.getRect());
+		return c.tangible(this) && getRect().intersects(c.getRect());
 	}
 
 	/*
@@ -150,10 +144,6 @@ public abstract class Platform implements Collidable, Drawable {
 		return new Rectangle((int) (x * Level.CELL_WIDTH),
 				(int) (y * Level.CELL_HEIGHT), (int) PLATFORM_WIDTH,
 				(int) PLATFORM_HEIGHT);
-	}
-
-	public boolean tangible() {
-		return tangible;
 	}
 
 	/**

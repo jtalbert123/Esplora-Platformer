@@ -4,7 +4,10 @@ import interfaces.KeyboardState;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.IOException;
 
 import level.Level;
@@ -44,6 +47,11 @@ public class Game {
 	 * The state of the keyboard after the last call to update.
 	 */
 	KeyboardState oldKeyboard;
+	
+	/**
+	 * The place to draw the next frame.
+	 */
+	BufferedImage nextFrame;
 
 	/**
 	 * Starts a new Game with the given level file.
@@ -59,6 +67,7 @@ public class Game {
 			level = null;
 			e.printStackTrace();
 		}
+		nextFrame = new BufferedImage((level.width + 1)*Level.CELL_WIDTH, (level.height + 1)*Level.CELL_HEIGHT, BufferedImage.TYPE_INT_RGB);
 		time = System.currentTimeMillis();
 	}
 
@@ -89,13 +98,11 @@ public class Game {
 	 *            the graphics object, should be the same graphics object passed
 	 *            into {@link #draw(Graphics)} on it's last call.
 	 */
-	public void clearItems(Graphics g) {
-		for (Collidable p : level) {
-			if (p.getClass() != Platform.class) {
-				Rectangle r = p.getRect();
-				g.clearRect(r.x, r.y, r.width, r.height);
-			}
-		}
+	public void clearItems() {
+		Graphics g = nextFrame.getGraphics();
+		g.setColor(Color.white);
+		g.fillRect(0, 0, nextFrame.getWidth(), nextFrame.getHeight());
+		g.dispose();
 	}
 
 	/**
@@ -131,20 +138,31 @@ public class Game {
 	 * @param g
 	 *            the {@link Graphics} object to draw on.
 	 */
-	public void draw(Graphics g) {
-		for (Drawable p : level.getAll(Drawable.class)) {
-			g.setColor(Color.black);
-			Rectangle r = p.getRect();
-			Graphics temp = g.create(r.x, r.y, r.width, r.height);
-			p.draw(temp);
-			temp.dispose();
-		}
-		if (gameOver) {
-			g.clearRect(0, 0, (level.width+1)*Level.CELL_WIDTH, (level.height+1)*Level.CELL_HEIGHT);
+	public void draw(Graphics canvas) {
+		Graphics g = nextFrame.getGraphics();
+		if (!gameOver) {
+			for (Drawable p : level.getAll(Drawable.class)) {
+				g.setColor(Color.black);
+				Rectangle r = p.getRect();
+				Graphics temp = g.create(r.x, r.y, r.width, r.height);
+				p.draw(temp);
+				temp.dispose();
+			}
+		} else {
+			g.clearRect(0, 0, (level.width + 1) * Level.CELL_WIDTH,
+					(level.height + 1) * Level.CELL_HEIGHT);
 			g.drawString("Game Over", 0, level.height * Level.CELL_HEIGHT / 2);
 		}
+		canvas.drawImage(nextFrame, 0, 0, new ImageObserver() {
+			
+			@Override
+			public boolean imageUpdate(Image img, int infoflags, int x, int y,
+					int width, int height) {
+				return true;
+			}
+		});
 	}
-	
+
 	/**
 	 * Returns the logical height and width of the level.
 	 * 
