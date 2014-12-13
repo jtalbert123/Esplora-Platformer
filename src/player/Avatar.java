@@ -1,7 +1,6 @@
 package player;
 
 import game.Collidable;
-import game.Drawable;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 import level.Level;
 import level.platforms.MovingPlatform;
 
-public class Avatar implements Collidable, Drawable {
+public class Avatar extends AbstractAvatars {
 
 	public static final int WIDTH = Level.CELL_WIDTH;
 	public static final int HEIGHT = Level.CELL_HEIGHT;

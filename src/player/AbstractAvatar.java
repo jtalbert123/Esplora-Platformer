@@ -107,13 +107,12 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 			xAcceleration = 0;
 		}
 
-		System.out.println(right);
 		if (right != null) {
-			 xVelocity = right.getXVelocity() - (xVelocity / 2);
+			xVelocity = right.getXVelocity() - (xVelocity / 2);
 			// xVelocity = Math.min(xVelocity, 0);
-//			xVelocity = 0;
-			 xAcceleration = Math.min(xAcceleration, 0);
-//			xAcceleration = 0;
+			// xVelocity = 0;
+			xAcceleration = Math.min(xAcceleration, 0);
+			// xAcceleration = 0;
 		}
 		if (left != null) {
 			xVelocity = left.getXVelocity() - (xVelocity / 2);
@@ -164,8 +163,8 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 
 	protected Collidable platformBelow(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
-		thisRect.setRect(thisRect.getX() - .05, thisRect.getY() - .05,
-				thisRect.getWidth() + .1, thisRect.getHeight() + .1);
+		thisRect.setRect(thisRect.getX() - .05, thisRect.getY(),
+				thisRect.getWidth() + .1, thisRect.getHeight());
 		for (Collidable c : level) {
 			if (c != this)
 				if (this.isCollidingWith(c)) {
@@ -183,16 +182,13 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	protected Collidable platformRight(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
 
-		thisRect.setRect(thisRect.getX() + .05, thisRect.getY(),
-				thisRect.getWidth(), thisRect.getHeight() - .1);
-
 		for (Collidable c : level) {
 			if (c != this)
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == (outCode | Rectangle2D.OUT_RIGHT)) {
+					if (outCode == Rectangle2D.OUT_RIGHT) {
 						return c;
 					}
 				}
@@ -203,16 +199,13 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	protected Collidable platformLeft(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
 
-		thisRect.setRect(thisRect.getX() + .05, thisRect.getY(),
-				thisRect.getWidth(), thisRect.getHeight() - .1);
-
 		for (Collidable c : level) {
 			if (c != this)
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == (outCode | Rectangle2D.OUT_LEFT)) {
+					if (outCode == Rectangle2D.OUT_LEFT) {
 						return c;
 					}
 				}

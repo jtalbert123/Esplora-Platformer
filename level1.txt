@@ -7,11 +7,11 @@ Width: 10 Height: 15
      -     |
      -     |
      -     |
-     - S   |
+     -     |
      -     |
      -{Vertical D 1}{Vertical Dn 1}    |
      -     |
      -     |
            |
--         -|
+-s        -|
 -----------|
