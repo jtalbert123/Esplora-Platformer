@@ -14,7 +14,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import player.AbstractAvatar;
 import player.Avatar;
+import player.Rolling;
 import level.platforms.Platform;
 import level.platforms.Spawn;
 
@@ -43,12 +45,12 @@ public class Level implements Iterable<Collidable> {
 	 * The height of the level, specified explicitly in the file.
 	 */
 	public int height;
-	
+
 	/**
 	 * The on-screen character
 	 */
-	private Avatar character;
-	
+	private AbstractAvatar character;
+
 	/**
 	 * The game this level is a part of.
 	 */
@@ -103,7 +105,7 @@ public class Level implements Iterable<Collidable> {
 				Matcher validate = token.matcher(line);
 				int column = 0;
 				while (validate.find()) {
-//					System.out.println(validate.group());
+					// System.out.println(validate.group());
 					String token = validate.group();
 					p = Platform.getPlatform(token, column, row);
 					if (p != null)
@@ -161,27 +163,41 @@ public class Level implements Iterable<Collidable> {
 				subset.add((PlatformType) p);
 			}
 		}
-		PlatformType[] array = (PlatformType[])Array.newInstance(type, subset.size());
+		PlatformType[] array = (PlatformType[]) Array.newInstance(type,
+				subset.size());
 		for (int i = 0; i < subset.size(); i++) {
 			array[i] = subset.get(i);
 		}
 		return array;
 	}
-	
+
+	/**
+	 * Creates a new character at a random spawn item in the level and puts it
+	 * at the end of the level elements array.
+	 */
 	public void spawn() {
 		Object[] array = getAll(Spawn.class);
-		Spawn s = (Spawn) array[((int)(Math.random()*array.length))];
-		character = new Avatar(s.getRect().getX()/CELL_WIDTH, s.getRect().getY()/CELL_WIDTH);
-		elements[elements.length-1] = (Collidable)character;
+		Spawn s = (Spawn) array[((int) (Math.random() * array.length))];
+		character = new Rolling(s.getRect().getX() / CELL_WIDTH, s.getRect()
+				.getY() / CELL_HEIGHT);
+		elements[elements.length - 1] = (Collidable) character;
 	}
-	
-	public Avatar getAvatar() {
+
+	/**
+	 * Returns the character. 
+	 * @return
+	 * @deprecated use {@link #isAlive()} where possible.
+	 */
+	public AbstractAvatar getAvatar() {
 		return character;
 	}
-	/*
-	public static void main(String[] args) throws IOException {
-		Level l = new Level("level1.txt");
-		System.out.println(l.getAll(MovingPlatform.class));
+	
+	public boolean isAlive() {
+		return character.isAlive();
 	}
-	*/
+	/*
+	 * public static void main(String[] args) throws IOException { Level l = new
+	 * Level("level1.txt"); System.out.println(l.getAll(MovingPlatform.class));
+	 * }
+	 */
 }

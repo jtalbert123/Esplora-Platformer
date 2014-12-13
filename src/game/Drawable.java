@@ -14,10 +14,12 @@ public interface Drawable {
 	 */
 	public void draw(Graphics g);
 	
+
 	/**
 	 * Gets the bounding {@link Rectangle} of the Platform.
 	 * 
-	 * @return the bounding rectangle of the platform in pixels <b>not logical grid spaces</b>.
+	 * @return the bounding rectangle of the platform in pixels <b>not logical
+	 *         grid spaces</b>.
 	 */
-	public Rectangle getRect();
+	public abstract Rectangle getRect();
 }

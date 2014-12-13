@@ -74,4 +74,12 @@ public class KeyboardState extends AbstractAction {
 		}
 		return localState.contains(key);
 	}
+	
+	public static boolean keyPressed(String key, KeyboardState old) {
+		return (state.contains(key) && !old.localState.contains(key));
+	}
+	
+	public static boolean keyReleased(String key, KeyboardState old) {
+		return (!state.contains(key) && old.localState.contains(key));
+	}
 }

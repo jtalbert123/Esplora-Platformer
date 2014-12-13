@@ -5,6 +5,7 @@ import game.Drawable;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -22,13 +23,13 @@ public abstract class Platform implements Collidable, Drawable {
 	 * The width of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int PLATFORM_WIDTH = Level.CELL_WIDTH - 1;
+	public static final int WIDTH = Level.CELL_WIDTH;
 
 	/**
 	 * The height of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int PLATFORM_HEIGHT = Level.CELL_HEIGHT - 1;
+	public static final int HEIGHT = Level.CELL_HEIGHT;
 
 	/**
 	 * The logical horizontal position of a platform (from left). Use
@@ -131,7 +132,8 @@ public abstract class Platform implements Collidable, Drawable {
 	 */
 	@Override
 	public boolean isCollidingWith(Collidable c) {
-		return c.tangible(this) && getRect().intersects(c.getRect());
+		return c.tangible(this)
+				&& getLogicalBounds().intersects(c.getLogicalBounds());
 	}
 
 	/*
@@ -142,8 +144,14 @@ public abstract class Platform implements Collidable, Drawable {
 	@Override
 	public Rectangle getRect() {
 		return new Rectangle((int) (x * Level.CELL_WIDTH),
-				(int) (y * Level.CELL_HEIGHT), (int) PLATFORM_WIDTH,
-				(int) PLATFORM_HEIGHT);
+				(int) (y * Level.CELL_HEIGHT), (int) WIDTH, (int) HEIGHT);
+	}
+
+	@Override
+	public Rectangle2D getLogicalBounds() {
+		return new Rectangle2D.Double(x, y, ((double) WIDTH)
+				/ ((double) Level.CELL_WIDTH), ((double) HEIGHT)
+				/ ((double) Level.CELL_HEIGHT));
 	}
 
 	/**
@@ -165,8 +173,15 @@ public abstract class Platform implements Collidable, Drawable {
 		return String.format("Platform at (%f, %f)", x, y);
 	}
 
-	
 	public abstract void draw(Graphics g);
 
 	public abstract void update(long currentTime, Level level);
+
+	public double getXVelocity() {
+		return 0;
+	}
+
+	public double getYVelocity() {
+		return 0;
+	}
 }

@@ -1,15 +1,17 @@
 Width: 10 Height: 15
 -----------|
+           |
       {stop}{stop}   |
            |
 ------     |
      -     |
      -     |
      -     |
+     - S   |
      -     |
-     -{Vertical Up 1}{Vertical Up 1}    |
+     -{Vertical D 1}{Vertical Dn 1}    |
      -     |
      -     |
-      {stop}{stop}---|
-s          |
+           |
+-         -|
 -----------|

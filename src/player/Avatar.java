@@ -2,11 +2,11 @@ package player;
 
 import game.Collidable;
 import game.Drawable;
-import interfaces.KeyboardState;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 import level.Level;
 import level.platforms.MovingPlatform;
@@ -64,13 +64,18 @@ public class Avatar implements Collidable, Drawable {
 		yDampening = 0;
 		isAlive = alive;
 	}
-
+	
+	@Override
+	public void update(long elapsedTime, Level level) {
+		// TODO Auto-generated method stub
+		//super.update(elapsedTime, level);
+	}
+/*
 	@Override
 	public void update(long elapsedTime, Level level) {
 		double time = elapsedTime / 1000.0;
 		KeyboardState kb = KeyboardState.getKeyboardState();
 
-		if (isAlive) {
 			if (kb.isKeyDown("w")) {
 				if (canJump)
 					yVelocity = -9.8 / 1.5;
@@ -159,109 +164,8 @@ public class Avatar implements Collidable, Drawable {
 
 			y += tempYV * time;
 			yVelocity = yVelocity * (1 - yDampening) + yAcceleration * time;
-		}
 	}
-
-	private Collidable platformAbove(Level level) {
-		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
-					Rectangle thisRect = getRect();
-					Rectangle cRect = c.getRect();
-
-					double xDisplacement = cRect.getCenterX()
-							- thisRect.getCenterX();
-					double yDisplacement = cRect.getCenterY()
-							- thisRect.getCenterY();
-					double angle = Math.atan2(-yDisplacement, xDisplacement);
-
-					double angleURCorner = Math.atan2(thisRect.height,
-							thisRect.width);
-					double angleULCorner = Math.atan2(thisRect.height,
-							-thisRect.width);
-					if (angle <= angleULCorner && angle >= angleURCorner) {
-						return c;
-					}
-				}
-		}
-		return null;
-	}
-
-	private Collidable platformBelow(Level level) {
-		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
-					Rectangle thisRect = getRect();
-					Rectangle cRect = c.getRect();
-
-					double xDisplacement = cRect.getCenterX()
-							- thisRect.getCenterX();
-					double yDisplacement = cRect.getCenterY()
-							- thisRect.getCenterY();
-					double angle = Math.atan2(-yDisplacement, xDisplacement);
-
-					double angleLRCorner = Math.atan2(-thisRect.height,
-							thisRect.width);
-					double angleLLCorner = Math.atan2(-thisRect.height,
-							-thisRect.width);
-					if (angle <= angleLRCorner && angle >= angleLLCorner) {
-						return c;
-					}
-				}
-		}
-		return null;
-	}
-
-	private Collidable platformRight(Level level) {
-		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
-					Rectangle thisRect = getRect();
-					Rectangle cRect = c.getRect();
-
-					double xDisplacement = cRect.getCenterX()
-							- thisRect.getCenterX();
-					double yDisplacement = cRect.getCenterY()
-							- thisRect.getCenterY();
-					double angle = Math.atan2(-yDisplacement, xDisplacement);
-
-					double angleURCorner = Math.atan2(thisRect.height,
-							thisRect.width);
-					double angleLRCorner = Math.atan2(-thisRect.height,
-							thisRect.width);
-					if (angle <= angleURCorner && angle >= angleLRCorner) {
-						return c;
-					}
-				}
-		}
-		return null;
-	}
-
-	private Collidable platformLeft(Level level) {
-		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
-					Rectangle thisRect = getRect();
-					Rectangle cRect = c.getRect();
-
-					double xDisplacement = cRect.getCenterX()
-							- thisRect.getCenterX();
-					double yDisplacement = cRect.getCenterY()
-							- thisRect.getCenterY();
-					double angle = Math.atan2(-yDisplacement, xDisplacement);
-
-					double angleULCorner = Math.atan2(thisRect.height,
-							-thisRect.width);
-					double angleLLCorner = Math.atan2(-thisRect.height,
-							-thisRect.width);
-					if (angle <= angleLLCorner || angle >= angleULCorner) {
-						return c;
-					}
-				}
-		}
-		return null;
-	}
-
+*/
 	@Override
 	public void draw(Graphics g) {
 		g.setColor(Color.BLUE);
@@ -271,7 +175,9 @@ public class Avatar implements Collidable, Drawable {
 
 	@Override
 	public boolean isCollidingWith(Collidable c) {
-		Rectangle r = c.getRect();
+		//TODO
+		return true;
+	/*	Rectangle r = c.getRect();
 		if (!MovingPlatform.class.isInstance(c)) {
 			r.width -= 2;
 			r.height -= 2;
@@ -279,6 +185,7 @@ public class Avatar implements Collidable, Drawable {
 			r.y += 1;
 		}
 		return getRect().intersects(r) && c.tangible(this);
+		*/
 	}
 
 	@Override
@@ -300,5 +207,11 @@ public class Avatar implements Collidable, Drawable {
 
 	public boolean isAlive() {
 		return isAlive;
+	}
+
+	@Override
+	public Rectangle2D getLogicalBounds() {
+		// TODO Auto-generated method stub
+		return new Rectangle2D.Double();
 	}
 }

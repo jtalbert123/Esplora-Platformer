@@ -176,4 +176,8 @@ public class Game {
 		// paused = true;
 		gameOver = true;
 	}
+	
+	public void init() {
+		time = System.currentTimeMillis();
+	}
 }

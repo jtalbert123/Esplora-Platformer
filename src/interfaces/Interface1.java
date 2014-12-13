@@ -116,6 +116,9 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 
 		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, false), "key pressed");
 		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, true), "key released");
+
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "key pressed");
+		keyStrokes.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "key released");
 		
 		ActionMap keyActions = this.getActionMap();
 		//actions
@@ -151,6 +154,7 @@ public class Interface1 extends JPanel implements ActionListener, Runnable {
 			e.printStackTrace();
 		}
 		Graphics g = canvas.getGraphics();
+		game.init();
 		while (true) {
 			game.clearItems();
 			game.update();

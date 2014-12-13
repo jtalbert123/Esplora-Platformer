@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 import level.Level;
 
@@ -19,11 +20,10 @@ public interface Collidable {
 	public void update(long elapsedTime, Level level);
 
 	/**
-	 * Checks for a collision with the given Collidable c. Note that this
-	 * method depends on {@link #tangible(Collidable)}, and as such is not
-	 * commutative. Even when the {@link #tangible(Collidable)} methods are
-	 * commutative for the <b>this</b> and c, the implementation may still not
-	 * be commutative.
+	 * Checks for a collision with the given Collidable c. Note that this method
+	 * depends on {@link #tangible(Collidable)}, and as such is not commutative.
+	 * Even when the {@link #tangible(Collidable)} methods are commutative for
+	 * the <b>this</b> and c, the implementation may still not be commutative.
 	 * 
 	 * @param p
 	 *            the platform that may be colliding with <b>this</b>
@@ -34,14 +34,6 @@ public interface Collidable {
 	public abstract boolean isCollidingWith(Collidable c);
 
 	/**
-	 * Gets the bounding {@link Rectangle} of the Platform.
-	 * 
-	 * @return the bounding rectangle of the platform in pixels <b>not logical
-	 *         grid spaces</b>.
-	 */
-	public abstract Rectangle getRect();
-
-	/**
 	 * Determines if c should illicit a reaction from <b>this</b> (if they were
 	 * to actually collide). Note that as with
 	 * {@link #isCollidingWith(Collidable)}, a.tangible(b) may not ==
@@ -50,5 +42,16 @@ public interface Collidable {
 	 * @return
 	 */
 	public boolean tangible(Collidable c);
+
+	/**
+	 * Returns the logical bounds of the object. Everything is in terms of the
+	 * logical grid in level.
+	 * 
+	 * @return
+	 */
+	public Rectangle2D getLogicalBounds();
+	
+	public double getYVelocity();
+	public double getXVelocity();
 
 }
