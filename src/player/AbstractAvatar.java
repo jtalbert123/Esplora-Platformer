@@ -153,7 +153,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == (outCode | Rectangle2D.OUT_TOP)) {
+					if (outCode == Rectangle2D.OUT_TOP) {
 						return c;
 					}
 				}
@@ -162,19 +162,22 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformBelow(Level level) {
-		Rectangle2D thisRect = getLogicalBounds();
-		thisRect.setRect(thisRect.getX() - .05, thisRect.getY(),
-				thisRect.getWidth() + .1, thisRect.getHeight());
 		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
+			if (c != this) {
+				Rectangle2D thisRect = getLogicalBounds();
+				thisRect.setRect(
+						thisRect.getX() - (Level.CELL_WIDTH - c.getWidth())
+								/ (2 * Level.CELL_WIDTH), thisRect.getY(),
+						c.getWidth() / Level.CELL_WIDTH, thisRect.getHeight());
+				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(new Point2D.Double(cRect
 							.getCenterX(), cRect.getCenterY()));
-					if (outCode == (outCode | Rectangle2D.OUT_BOTTOM)) {
+					if (outCode == Rectangle2D.OUT_BOTTOM) {
 						return c;
 					}
 				}
+			}
 		}
 		return null;
 	}
@@ -238,5 +241,15 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	@Override
 	public double getXVelocity() {
 		return xVelocity;
+	}
+	
+	@Override
+	public double getWidth() {
+		return WIDTH;
+	}
+	
+	@Override
+	public double getHeight() {
+		return HEIGHT;
 	}
 }

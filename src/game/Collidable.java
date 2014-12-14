@@ -53,5 +53,8 @@ public interface Collidable {
 	
 	public double getYVelocity();
 	public double getXVelocity();
+	
+	public double getWidth();
+	public double getHeight();
 
 }

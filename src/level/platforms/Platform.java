@@ -184,4 +184,14 @@ public abstract class Platform implements Collidable, Drawable {
 	public double getYVelocity() {
 		return 0;
 	}
+	
+	@Override
+	public double getWidth() {
+		return WIDTH;
+	}
+	
+	@Override
+	public double getHeight() {
+		return HEIGHT;
+	}
 }

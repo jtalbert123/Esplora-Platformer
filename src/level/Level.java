@@ -14,11 +14,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import player.AbstractAvatar;
-import player.Avatar;
-import player.Rolling;
 import level.platforms.Platform;
 import level.platforms.Spawn;
+import player.AbstractAvatar;
+import player.Rolling;
 
 /**
  * A single level of a platformer {@link Game}.

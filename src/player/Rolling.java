@@ -5,7 +5,6 @@ import game.Collidable;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 
 import level.Level;
 
@@ -19,7 +18,7 @@ public class Rolling extends AbstractAvatar {
 	/**
 	 * Used for computing velocity after landing.
 	 */
-	private static final double MASS = 1;
+//	private static final double MASS = 1;
 
 	protected double angle;
 	protected double angularVelocity;

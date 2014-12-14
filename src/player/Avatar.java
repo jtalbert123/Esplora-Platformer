@@ -10,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 import level.Level;
 import level.platforms.MovingPlatform;
 
-public class Avatar extends AbstractAvatars {
+public class Avatar extends AbstractAvatar {
 
 	public static final int WIDTH = Level.CELL_WIDTH;
 	public static final int HEIGHT = Level.CELL_HEIGHT;
