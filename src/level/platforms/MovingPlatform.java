@@ -133,16 +133,16 @@ public class MovingPlatform extends Platform {
 		int outCode = thisRect.outcode(new Point2D.Double(cRect.getCenterX(),
 				cRect.getCenterY()));
 		if (direction == Direction.UP) {
-			if (outCode == (outCode | Rectangle2D.OUT_TOP))
+			if (outCode == (Rectangle2D.OUT_TOP))
 				return true;
 		} else if (direction == Direction.RIGHT) {
-			if (outCode == (outCode | Rectangle2D.OUT_RIGHT))
+			if (outCode == (Rectangle2D.OUT_RIGHT))
 				return true;
 		} else if (direction == Direction.DOWN) {
-			if (outCode == (outCode | Rectangle2D.OUT_BOTTOM))
+			if (outCode == (Rectangle2D.OUT_BOTTOM))
 				return true;
 		} else if (direction == Direction.LEFT) {
-			if (outCode == (outCode | Rectangle2D.OUT_LEFT))
+			if (outCode == (Rectangle2D.OUT_LEFT))
 				return true;
 		}
 		return false;

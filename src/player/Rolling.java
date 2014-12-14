@@ -11,14 +11,14 @@ import level.Level;
 public class Rolling extends AbstractAvatar {
 
 	// private static final double DEFAULT_FRICTION = .5;
-//	private static final double ANGULAR_DAMPING = .2;
-//	private static final double MOVEMENT_ACCELERATION = 5;
-	private static final double RADIUS = .5;
+	// private static final double ANGULAR_DAMPING = .2;
+	// private static final double MOVEMENT_ACCELERATION = 5;
+	private static final double RADIUS = WIDTH / 2;
 
 	/**
 	 * Used for computing velocity after landing.
 	 */
-//	private static final double MASS = 1;
+	// private static final double MASS = 1;
 
 	protected double angle;
 	protected double angularVelocity;
@@ -33,7 +33,7 @@ public class Rolling extends AbstractAvatar {
 		angularVelocity = 0;
 		angularAcceleration = 0;
 	}
-	
+
 	public Rolling(double x, double y) {
 		super(x, y);
 		angle = 0;
@@ -43,7 +43,8 @@ public class Rolling extends AbstractAvatar {
 
 	@Override
 	public Rectangle getRect() {
-		return new Rectangle((int)(x*Level.CELL_WIDTH), (int)(y*Level.CELL_HEIGHT), WIDTH, HEIGHT);
+		return new Rectangle((int) (x * Level.CELL_WIDTH),
+				(int) (y * Level.CELL_HEIGHT), WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -55,17 +56,23 @@ public class Rolling extends AbstractAvatar {
 	public void draw(Graphics g) {
 		g.setColor(Color.BLUE);
 		int diameter = Math.min(WIDTH, HEIGHT) - 1;
-		g.fillOval((WIDTH - diameter)/2, (HEIGHT - diameter)/2, diameter, diameter);
+		g.fillOval((WIDTH - diameter) / 2, (HEIGHT - diameter) / 2, diameter,
+				diameter);
 		g.setColor(Color.ORANGE);
-		g.setPaintMode();
 		Rectangle r = getRect();
-		g.drawLine((int)(r.getCenterX()), (int)(r.getCenterY()), (int)(r.getCenterX())-5, (int)(r.getCenterY()));
-				//, (int)(WIDTH*RADIUS*Math.cos(angle)), (int)(WIDTH*RADIUS*Math.sin(angle)));
+		double x = (Math.cos(angle) * RADIUS) + (r.getWidth() / 2);
+		double y = (Math.sin(angle) * RADIUS) + (r.getHeight() / 2);
+
+		double x2 = (Math.cos(angle + Math.PI/2) * RADIUS) + (r.getWidth() / 2);
+		double y2 = (Math.sin(angle + Math.PI/2) * RADIUS) + (r.getHeight() / 2);
+		g.drawLine((int) (r.getHeight()-x), (int) (r.getHeight()-y), (int) (x), (int) (y));
+
+		g.drawLine((int) (r.getHeight()-x2), (int) (r.getHeight()-y2), (int) (x2), (int) (y2));
 	}
 
 	@Override
 	public void update(long elapsedTime, Level level) {
 		super.update(elapsedTime, level);
-		angle = x/RADIUS;
+		angle = (x-2.54321) / (RADIUS / WIDTH);
 	}
 }

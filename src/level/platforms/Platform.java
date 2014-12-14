@@ -23,13 +23,13 @@ public abstract class Platform implements Collidable, Drawable {
 	 * The width of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int WIDTH = Level.CELL_WIDTH;
+	public final int WIDTH = Level.CELL_WIDTH;
 
 	/**
 	 * The height of a platform object, used for rendering and collision
 	 * detection ({@link #getRect()}).
 	 */
-	public static final int HEIGHT = Level.CELL_HEIGHT;
+	public final int HEIGHT = Level.CELL_HEIGHT;
 
 	/**
 	 * The logical horizontal position of a platform (from left). Use
@@ -187,11 +187,11 @@ public abstract class Platform implements Collidable, Drawable {
 	
 	@Override
 	public double getWidth() {
-		return WIDTH;
+		return this.WIDTH;
 	}
 	
 	@Override
 	public double getHeight() {
-		return HEIGHT;
+		return this.HEIGHT;
 	}
 }

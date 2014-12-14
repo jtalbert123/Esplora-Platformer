@@ -54,8 +54,10 @@ public class KeyboardState extends AbstractAction {
 	public static KeyboardState getKeyboardState() {
 		KeyboardState kbs = new KeyboardState();
 		kbs.localState = new HashSet<>();
-		for (String s : state) {
-			kbs.localState.add(s);
+		synchronized (kbs) {
+			for (String s : state) {
+				kbs.localState.add(s);
+			}
 		}
 		kbs.type = 3;
 		return kbs;

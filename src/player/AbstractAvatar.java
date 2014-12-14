@@ -96,8 +96,8 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 			}
 		}
 
-		yVelocity += yAcceleration * time;
 		y += yVelocity * time;
+		yVelocity += yAcceleration * time;
 
 		if (keyboard.isKeyDown("d") && keyboard.isKeyUp("a")) {
 			xAcceleration = 50;
@@ -108,27 +108,25 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 		}
 
 		if (right != null) {
-			xVelocity = right.getXVelocity() - (xVelocity / 2);
-			// xVelocity = Math.min(xVelocity, 0);
-			// xVelocity = 0;
+			xVelocity = Math.min(right.getXVelocity(), xVelocity);
 			xAcceleration = Math.min(xAcceleration, 0);
-			// xAcceleration = 0;
 		}
 		if (left != null) {
-			xVelocity = left.getXVelocity() - (xVelocity / 2);
-			// xVelocity = Math.max(xVelocity, 0);
+			xVelocity = Math.max(left.getXVelocity(), xVelocity);
 			xAcceleration = Math.max(xAcceleration, 0);
-
 		}
 
-		xVelocity = xVelocity * (1 - DAMPING) + xAcceleration * time;
 		x = x + xVelocity * time;
+		xVelocity = xVelocity * (1 - DAMPING) + xAcceleration * time;
 		if (x < 0) {
 			x = 0;
 			xVelocity = Math.max(xVelocity, 0);
-		} else if (x > level.width) {
-			x = level.width;
+		} else if (x > (level.width + ((double)Level.CELL_WIDTH - WIDTH)/((double)Level.CELL_WIDTH))) {
+			x = (level.width + ((double)Level.CELL_WIDTH - WIDTH)/((double)Level.CELL_WIDTH));
 			xVelocity = Math.min(xVelocity, 0);
+		}
+		if (y > level.height + 1) {
+			alive = false;
 		}
 		oldKeyboard = keyboard;
 	}
@@ -145,18 +143,22 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformAbove(Level level) {
-		Rectangle2D thisRect = getLogicalBounds();
 
 		for (Collidable c : level) {
-			if (c != this)
-				if (this.isCollidingWith(c)) {
+			if (c != this) {
+				Rectangle2D thisRect = getLogicalBounds();
+				thisRect.setRect(
+						thisRect.getX() + .1, thisRect.getY(),
+						thisRect.getWidth()-.2, thisRect.getHeight());
+				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == Rectangle2D.OUT_TOP) {
+					if (outCode == (outCode | Rectangle2D.OUT_TOP)) {
 						return c;
 					}
 				}
+			}
 		}
 		return null;
 	}
@@ -166,14 +168,13 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 			if (c != this) {
 				Rectangle2D thisRect = getLogicalBounds();
 				thisRect.setRect(
-						thisRect.getX() - (Level.CELL_WIDTH - c.getWidth())
-								/ (2 * Level.CELL_WIDTH), thisRect.getY(),
-						c.getWidth() / Level.CELL_WIDTH, thisRect.getHeight());
+						thisRect.getX() + .1, thisRect.getY(),
+						thisRect.getWidth()-.2, thisRect.getHeight());
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(new Point2D.Double(cRect
 							.getCenterX(), cRect.getCenterY()));
-					if (outCode == Rectangle2D.OUT_BOTTOM) {
+					if (outCode == (outCode | Rectangle2D.OUT_BOTTOM)) {
 						return c;
 					}
 				}
@@ -183,35 +184,38 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformRight(Level level) {
-		Rectangle2D thisRect = getLogicalBounds();
-
 		for (Collidable c : level) {
-			if (c != this)
+			if (c != this) {
+				Rectangle2D thisRect = getLogicalBounds();
+				thisRect.setRect(thisRect.getX(), thisRect.getY()+.1, thisRect.getWidth(), thisRect.getHeight()-.2);
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == Rectangle2D.OUT_RIGHT) {
+					if (outCode == (outCode | Rectangle2D.OUT_RIGHT)) {
 						return c;
 					}
 				}
+			}
 		}
 		return null;
 	}
 
 	protected Collidable platformLeft(Level level) {
-		Rectangle2D thisRect = getLogicalBounds();
 
 		for (Collidable c : level) {
-			if (c != this)
+			if (c != this) {
+				Rectangle2D thisRect = getLogicalBounds();
+				thisRect.setRect(thisRect.getX(), thisRect.getY()+.1, thisRect.getWidth(), thisRect.getHeight()-.2);
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
 							cRect.getCenterY());
-					if (outCode == Rectangle2D.OUT_LEFT) {
+					if (outCode == (outCode | Rectangle2D.OUT_LEFT)) {
 						return c;
 					}
 				}
+			}
 		}
 		return null;
 	}
@@ -242,12 +246,12 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	public double getXVelocity() {
 		return xVelocity;
 	}
-	
+
 	@Override
 	public double getWidth() {
 		return WIDTH;
 	}
-	
+
 	@Override
 	public double getHeight() {
 		return HEIGHT;
