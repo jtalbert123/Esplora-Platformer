@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import level.Level;
+import level.platforms.EndPoint;
 
 public abstract class AbstractAvatar implements Drawable, Collidable {
 	protected static final int WIDTH = 30;
@@ -75,6 +76,11 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 			y -= .25;
 			canJump = false;
 		}
+		if (up != null) {
+			if (yVelocity < up.getYVelocity()) {
+				yVelocity = up.getYVelocity() - yVelocity / 2;
+			}
+		}
 		if (down == null) {
 			yAcceleration = GRAVITATIONAL_ACCELERATION;
 		} else {
@@ -89,11 +95,6 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 						/ ((double) Level.CELL_HEIGHT) - .1;
 			}
 			canJump = true;
-		}
-		if (up != null) {
-			if (yVelocity < up.getYVelocity()) {
-				yVelocity = up.getYVelocity() - yVelocity / 2;
-			}
 		}
 
 		y += yVelocity * time;
@@ -143,13 +144,10 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformAbove(Level level) {
-
+		Rectangle2D thisRect = getLogicalBounds();
+		scaleRect(thisRect, .85, 1);
 		for (Collidable c : level) {
 			if (c != this) {
-				Rectangle2D thisRect = getLogicalBounds();
-				thisRect.setRect(
-						thisRect.getX() + .1, thisRect.getY(),
-						thisRect.getWidth()-.2, thisRect.getHeight());
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
@@ -164,12 +162,10 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformBelow(Level level) {
+		Rectangle2D thisRect = getLogicalBounds();
+		scaleRect(thisRect, .85, 1);
 		for (Collidable c : level) {
 			if (c != this) {
-				Rectangle2D thisRect = getLogicalBounds();
-				thisRect.setRect(
-						thisRect.getX() + .1, thisRect.getY(),
-						thisRect.getWidth()-.2, thisRect.getHeight());
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(new Point2D.Double(cRect
@@ -184,10 +180,10 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformRight(Level level) {
+		Rectangle2D thisRect = getLogicalBounds();
+		scaleRect(thisRect, 1, .9);
 		for (Collidable c : level) {
 			if (c != this) {
-				Rectangle2D thisRect = getLogicalBounds();
-				thisRect.setRect(thisRect.getX(), thisRect.getY()+.1, thisRect.getWidth(), thisRect.getHeight()-.2);
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
@@ -202,11 +198,10 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	}
 
 	protected Collidable platformLeft(Level level) {
-
+		Rectangle2D thisRect = getLogicalBounds();
+		scaleRect(thisRect, 1, .9);
 		for (Collidable c : level) {
 			if (c != this) {
-				Rectangle2D thisRect = getLogicalBounds();
-				thisRect.setRect(thisRect.getX(), thisRect.getY()+.1, thisRect.getWidth(), thisRect.getHeight()-.2);
 				if (this.isCollidingWith(c, thisRect)) {
 					Rectangle2D cRect = c.getLogicalBounds();
 					int outCode = thisRect.outcode(cRect.getCenterX(),
@@ -226,8 +221,16 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 				&& c.getLogicalBounds().intersects(getLogicalBounds());
 	}
 
-	private boolean isCollidingWith(Collidable c, Rectangle2D r) {
+	protected boolean isCollidingWith(Collidable c, Rectangle2D r) {
 		return c.tangible(this) && c.getLogicalBounds().intersects(r);
+	}
+	
+	protected void scaleRect(Rectangle2D r, double xScale, double yScale) {
+		double width = r.getWidth() * xScale;
+		double height = r.getHeight() * yScale;
+		double x = r.getX() + (r.getWidth() - width)/2;
+		double y = r.getY() + (r.getHeight() - height)/2;
+		r.setRect(x, y, width, height);
 	}
 
 	@Override
@@ -255,5 +258,12 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 	@Override
 	public double getHeight() {
 		return HEIGHT;
+	}
+
+	@Override
+	public boolean tangible(Collidable c) {
+		if (EndPoint.class.isInstance(c))
+			return true;
+		return false;
 	}
 }

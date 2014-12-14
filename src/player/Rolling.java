@@ -48,11 +48,6 @@ public class Rolling extends AbstractAvatar {
 	}
 
 	@Override
-	public boolean tangible(Collidable c) {
-		return false;
-	}
-
-	@Override
 	public void draw(Graphics g) {
 		g.setColor(Color.BLUE);
 		int diameter = Math.min(WIDTH, HEIGHT) - 1;
