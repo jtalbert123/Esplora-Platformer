@@ -11,8 +11,8 @@ import level.Level;
 import level.platforms.EndPoint;
 
 public abstract class AbstractAvatar implements Drawable, Collidable {
-	protected static final int WIDTH = 30;
-	protected static final int HEIGHT = 30;
+	protected final int WIDTH = 30;
+	protected final int HEIGHT = 30;
 
 	protected static final double GRAVITATIONAL_ACCELERATION = 9.8;
 	protected static final double DAMPING = .2;
@@ -86,7 +86,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 		} else {
 			yAcceleration = 0;
 			if (yVelocity > down.getYVelocity()) {
-				yVelocity = down.getYVelocity() - yVelocity / 2;
+				yVelocity = down.getYVelocity();
 			} else {
 				yVelocity = down.getYVelocity();
 			}
@@ -94,11 +94,9 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 				y = down.getLogicalBounds().getY() - ((double) HEIGHT)
 						/ ((double) Level.CELL_HEIGHT) - .1;
 			}
+			x+=down.getXVelocity()*time;
 			canJump = true;
 		}
-
-		y += yVelocity * time;
-		yVelocity += yAcceleration * time;
 
 		if (keyboard.isKeyDown("d") && keyboard.isKeyUp("a")) {
 			xAcceleration = 50;
@@ -116,9 +114,6 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 			xVelocity = Math.max(left.getXVelocity(), xVelocity);
 			xAcceleration = Math.max(xAcceleration, 0);
 		}
-
-		x = x + xVelocity * time;
-		xVelocity = xVelocity * (1 - DAMPING) + xAcceleration * time;
 		if (x < 0) {
 			x = 0;
 			xVelocity = Math.max(xVelocity, 0);
@@ -129,6 +124,17 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 		if (y > level.height + 1) {
 			alive = false;
 		}
+		
+		xAcceleration = trim(xAcceleration, .1);
+		yAcceleration = trim(yAcceleration, .1);
+		
+		x = x + xVelocity * time;
+		xVelocity = xVelocity * (1 - DAMPING) + xAcceleration * time;
+
+
+		y += yVelocity * time;
+		yVelocity += yAcceleration * time;
+		
 		oldKeyboard = keyboard;
 	}
 

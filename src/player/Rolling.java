@@ -1,6 +1,6 @@
 package player;
 
-import game.Collidable;
+import interfaces.KeyboardState;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,7 +13,7 @@ public class Rolling extends AbstractAvatar {
 	// private static final double DEFAULT_FRICTION = .5;
 	// private static final double ANGULAR_DAMPING = .2;
 	// private static final double MOVEMENT_ACCELERATION = 5;
-	private static final double RADIUS = WIDTH / 2;
+	private final double RADIUS = WIDTH / 2;
 
 	/**
 	 * Used for computing velocity after landing.
@@ -58,16 +58,33 @@ public class Rolling extends AbstractAvatar {
 		double x = (Math.cos(angle) * RADIUS) + (r.getWidth() / 2);
 		double y = (Math.sin(angle) * RADIUS) + (r.getHeight() / 2);
 
-		double x2 = (Math.cos(angle + Math.PI/2) * RADIUS) + (r.getWidth() / 2);
-		double y2 = (Math.sin(angle + Math.PI/2) * RADIUS) + (r.getHeight() / 2);
-		g.drawLine((int) (r.getHeight()-x), (int) (r.getHeight()-y), (int) (x), (int) (y));
+		double x2 = (Math.cos(angle + Math.PI / 2) * RADIUS)
+				+ (r.getWidth() / 2);
+		double y2 = (Math.sin(angle + Math.PI / 2) * RADIUS)
+				+ (r.getHeight() / 2);
+		g.drawLine((int) (r.getHeight() - x), (int) (r.getHeight() - y),
+				(int) (x), (int) (y));
 
-		g.drawLine((int) (r.getHeight()-x2), (int) (r.getHeight()-y2), (int) (x2), (int) (y2));
+		g.drawLine((int) (r.getHeight() - x2), (int) (r.getHeight() - y2),
+				(int) (x2), (int) (y2));
 	}
 
 	@Override
 	public void update(long elapsedTime, Level level) {
 		super.update(elapsedTime, level);
-		angle = (x-2.54321) / (RADIUS / WIDTH);
+
+		double time = ((double)elapsedTime)/1000.0;
+		KeyboardState keyboard = KeyboardState.getKeyboardState();
+		
+		if (keyboard.isKeyDown("a") && keyboard.isKeyUp("d")) {
+			angularAcceleration = -100*RADIUS/Level.CELL_WIDTH;
+		} else if (keyboard.isKeyDown("d") && keyboard.isKeyUp("a")) {
+			angularAcceleration = 100*RADIUS/Level.CELL_WIDTH;
+		} else {
+			angularAcceleration = 0;
+		}
+		angularAcceleration = trim(angularAcceleration, .1);
+		angle += angularVelocity * time;
+		angularVelocity = angularVelocity*(1-DAMPING) + angularAcceleration*time;
 	}
 }
