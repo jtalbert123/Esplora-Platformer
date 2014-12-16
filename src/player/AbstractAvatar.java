@@ -151,7 +151,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 
 	protected Collidable platformAbove(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
-		scaleRect(thisRect, .85, 1);
+		scaleRect(thisRect, .8, 1);
 		for (Collidable c : level) {
 			if (c != this) {
 				if (this.isCollidingWith(c, thisRect)) {
@@ -169,7 +169,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 
 	protected Collidable platformBelow(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
-		scaleRect(thisRect, .85, 1);
+		scaleRect(thisRect, .8, 1);
 		for (Collidable c : level) {
 			if (c != this) {
 				if (this.isCollidingWith(c, thisRect)) {
@@ -187,7 +187,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 
 	protected Collidable platformRight(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
-		scaleRect(thisRect, 1, .9);
+		scaleRect(thisRect, 1, .8);
 		for (Collidable c : level) {
 			if (c != this) {
 				if (this.isCollidingWith(c, thisRect)) {
@@ -205,7 +205,7 @@ public abstract class AbstractAvatar implements Drawable, Collidable {
 
 	protected Collidable platformLeft(Level level) {
 		Rectangle2D thisRect = getLogicalBounds();
-		scaleRect(thisRect, 1, .9);
+		scaleRect(thisRect, 1, .8);
 		for (Collidable c : level) {
 			if (c != this) {
 				if (this.isCollidingWith(c, thisRect)) {

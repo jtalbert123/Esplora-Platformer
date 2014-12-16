@@ -1,7 +1,5 @@
 package player;
 
-import interfaces.KeyboardState;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -74,17 +72,10 @@ public class Rolling extends AbstractAvatar {
 		super.update(elapsedTime, level);
 
 		double time = ((double)elapsedTime)/1000.0;
-		KeyboardState keyboard = KeyboardState.getKeyboardState();
 		
-		if (keyboard.isKeyDown("a") && keyboard.isKeyUp("d")) {
-			angularAcceleration = -100*RADIUS/Level.CELL_WIDTH;
-		} else if (keyboard.isKeyDown("d") && keyboard.isKeyUp("a")) {
-			angularAcceleration = 100*RADIUS/Level.CELL_WIDTH;
-		} else {
-			angularAcceleration = 0;
-		}
-		angularAcceleration = trim(angularAcceleration, .1);
+		//24 determined through visual experimentation, not math
+		angularVelocity = xVelocity / (RADIUS/24);
+		
 		angle += angularVelocity * time;
-		angularVelocity = angularVelocity*(1-DAMPING) + angularAcceleration*time;
 	}
 }
